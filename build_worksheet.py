@@ -119,7 +119,7 @@ P.append(("18", f"윤서네 반은 한 묶음에 12장씩 들어 있는 색종�
 P.append(("19", "□ 안에 들어갈 수 있는 자연수는 모두 몇 개입니까?",
           f'<div class="ineq"><span class="mx">{BOX}{fr(2, 5)}</span> &lt; {mx(2, 5, 9)} × {mx(1, 4, 5)}</div>', "개"))
 
-PAGES = [P[0:6], P[6:12], P[12:16]]
+PAGES = [P[i:i + 4] for i in range(0, len(P), 4)]
 
 
 def render_problem(num, text, extra, unit, top=False):
@@ -142,10 +142,8 @@ header .t2 { font-size: 18pt; font-weight: bold; margin-top: 1mm; }
 header .info { font-size: 11pt; white-space: nowrap; }
 header .info span { display: inline-block; border-bottom: 1px solid #000; width: 28mm; margin-left: 2mm; }
 .small-head { font-size: 10pt; color: #1d6b4f; font-weight: bold; border-bottom: 1.5px solid #1d6b4f; padding-bottom: 2mm; margin-bottom: 4mm; display: flex; justify-content: space-between; }
-.grid { flex: 1; display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: repeat(3, 1fr); column-gap: 8mm; }
-.grid.r2 { grid-template-rows: repeat(2, 1fr); }
+.grid { flex: 1; display: grid; grid-template-columns: 1fr; grid-template-rows: repeat(4, 1fr); }
 .prob { border-top: 1px dashed #bbb; padding: 3mm 0 2mm; display: flex; flex-direction: column; position: relative; }
-.grid { grid-auto-flow: column; }
 .prob.top { border-top: none; padding-top: 0; }
 .q { display: flex; gap: 2.5mm; align-items: flex-start; }
 .num { font-size: 17pt; font-weight: bold; color: #1d6b4f; line-height: 1; min-width: 9mm; }
@@ -179,9 +177,8 @@ def main():
             )
         else:
             head = '<div class="small-head"><span>5학년 2학기 · 2. 분수의 곱셈 — 오답 다시 풀기</span></div>'
-        cls = "grid r2" if len(probs) == 4 else "grid"
-        rows = len(probs) // 2
-        body = "".join(render_problem(*p, top=(k % rows == 0)) for k, p in enumerate(probs))
+        cls = "grid"
+        body = "".join(render_problem(*p, top=(k == 0)) for k, p in enumerate(probs))
         pages.append(f'<section class="page">{head}<div class="{cls}">{body}</div><footer>{i + 1} / {len(PAGES)}</footer></section>')
     html = (
         '<!doctype html><html lang="ko"><head><meta charset="utf-8">'
