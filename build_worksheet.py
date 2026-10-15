@@ -29,7 +29,7 @@ def svg_frac(x, y, n, d, size=15, anchor="middle"):
 def number_line(parts, end_n, end_d, target):
     W, x0, x1, y = 330, 20, 310, 22
     step = (x1 - x0) / parts
-    s = [f'<svg viewBox="0 0 {W} 128" width="{W}" height="128">']
+    s = [f'<svg viewBox="0 0 {W} 112" width="{W}" height="112">']
     s.append(f'<line x1="{x0}" y1="{y}" x2="{x1}" y2="{y}" stroke="#000" stroke-width="1.6"/>')
     for i in range(parts + 1):
         x = x0 + i * step
@@ -42,9 +42,9 @@ def number_line(parts, end_n, end_d, target):
     s.append(f'<text x="{x0}" y="{y + 32}" font-size="15" text-anchor="middle">0</text>')
     s.append(svg_frac(x1, y + 40, end_n, end_d))
     tx = x0 + target * step
-    s.append(f'<line x1="{tx}" y1="{y + 64}" x2="{tx}" y2="{y + 14}" stroke="#000" stroke-width="1.4"/>')
+    s.append(f'<line x1="{tx}" y1="{y + 50}" x2="{tx}" y2="{y + 14}" stroke="#000" stroke-width="1.4"/>')
     s.append(f'<path d="M{tx - 5},{y + 22} L{tx},{y + 13} L{tx + 5},{y + 22}" fill="none" stroke="#000" stroke-width="1.4"/>')
-    s.append(f'<rect x="{tx - 22}" y="{y + 64}" width="44" height="40" fill="#fff" stroke="#000" stroke-width="1.4"/>')
+    s.append(f'<rect x="{tx - 22}" y="{y + 50}" width="40" height="36" fill="#fff" stroke="#000" stroke-width="1.4"/>')
     s.append("</svg>")
     return "".join(s)
 
@@ -71,7 +71,7 @@ def fig09():
     for i, lab in ((0, "ㄱ"), (1, "ㄴ"), (2, "ㄷ"), (3, "ㄹ"), (6, "ㅁ")):
         x = x0 + i * step
         s.append(f'<circle cx="{x}" cy="{y}" r="3.5" fill="#000"/>')
-        s.append(f'<text x="{x}" y="{y + 32}" font-size="16" text-anchor="middle" font-weight="bold">{lab}</text>')
+        s.append(f'<text x="{x}" y="{y + 32}" font-size="16" text-anchor="middle">{lab}</text>')
     s.append("</svg>")
     return "".join(s)
 
@@ -119,11 +119,11 @@ P.append(("16", f"어떤 수에 {fr(2, 5)}를 곱해야 할 것을 잘못하여 
           f'<div class="choices"><span>① {fr(2, 11)}</span><span>② {fr(4, 11)}</span><span>③ {fr(6, 11)}</span><span>④ {fr(8, 11)}</span><span>⑤ {fr(10, 11)}</span></div>', ""))
 P.append(("17", f"빵집에 빵이 진열되어 있습니다. 하루 동안 처음 있던 빵의 {fr(3, 4)}을 팔고, 남은 빵의 개수를 세어 보니 모두 15개였습니다. 처음에 진열되어 있던 빵은 모두 몇 개입니까?", "", "개"))
 P.append(("18", f"윤서네 반은 한 묶음에 12장씩 들어 있는 색종이 다섯 묶음을 샀습니다. 반 학생들이 한 장씩 나누어 가졌더니 전체의 {fr(1, 5)}이 남았다면, 윤서네 반 학생 수는 모두 몇 명입니까?", "", "명"))
-P.append(("19", "□ 안에 들어갈 수 있는 자연수는 모두 몇 개입니까?",
-          f'<div class="ineq"><span class="mx">{BOX}{fr(2, 5)}</span> &lt; {mx(2, 5, 9)} × {mx(1, 4, 5)}</div>', "개"))
+P.append(("19", f"{BOX} 안에 들어갈 수 있는 자연수는 모두 몇 개입니까?",
+          f'<div class="ineq"><span class="mx">{BOX}{fr(2, 5)}</span><span class="op">&lt;</span>{mx(2, 5, 9)}<span class="op">×</span>{mx(1, 4, 5)}</div>', "개"))
 
 # 풀이 공간 비율: 고르기 문제는 좁게, 여러 단계 문제는 넓게
-WEIGHT = {"05": 2, "06": 2, "09": 2.4, "10": 2.4, "11": 2.6, "12": 2.6, "08": 3.6, "13": 3.6, "15": 3.6, "18": 3.6}
+WEIGHT = {"05": 2, "06": 2, "09": 2.4, "10": 2.4, "11": 2.6, "12": 2.6, "08": 3.0, "13": 3.6, "15": 3.6, "18": 3.6}
 
 PAGES = [P[i:i + 4] for i in range(0, len(P), 4)]
 
@@ -158,9 +158,11 @@ header .info span { display: inline-block; border-bottom: 1px solid #000; width:
 .fr > span:first-child { border-bottom: 1.2px solid #000; padding: 0 0.15em; }
 .fr > span:last-child { padding: 0 0.15em; }
 .mx { white-space: nowrap; }
+.mx > .fr { margin-left: 0.02em; }
+.op { font-family: 'DejaVu Sans', sans-serif; font-size: 0.95em; margin: 0 0.35em; }
 .box { display: inline-block; width: 1.1em; height: 1.25em; border: 1.4px solid #000; vertical-align: middle; }
 .opts { font-size: 11.5pt; line-height: 2.1; margin: 1.5mm 0 0 11.5mm; padding: 1.5mm 3mm; border: 1px solid #999; border-radius: 2mm; display: inline-block; min-width: 90mm; }
-.choices { margin: 2mm 0 0 11.5mm; font-size: 11.5pt; display: flex; gap: 12mm; flex-wrap: wrap; }
+.choices { margin: 2mm 0 0 11.5mm; font-size: 12.5pt; display: flex; gap: 12mm; flex-wrap: wrap; }
 .ineq { margin: 3mm 0 0 11.5mm; font-size: 13pt; padding: 2mm 4mm; border: 1px solid #999; border-radius: 2mm; display: inline-block; align-self: flex-start; min-width: 90mm; }
 .opts { align-self: flex-start; }
 .fig { margin: 2mm 0 0 8mm; zoom: 1.3; }
