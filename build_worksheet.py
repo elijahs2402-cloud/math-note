@@ -68,7 +68,7 @@ def fig09():
                 f'<path d="M{x},{y + 3} Q{x + step / 2},{y + 18} {x + step},{y + 3}" '
                 f'fill="none" stroke="#777" stroke-width="0.9"/>'
             )
-    for i, lab in ((0, "ㄱ"), (1, "ㄴ"), (6, "ㅁ")):
+    for i, lab in ((0, "ㄱ"), (1, "ㄴ"), (2, "ㄷ"), (3, "ㄹ"), (6, "ㅁ")):
         x = x0 + i * step
         s.append(f'<circle cx="{x}" cy="{y}" r="3.5" fill="#000"/>')
         s.append(f'<text x="{x}" y="{y + 32}" font-size="16" text-anchor="middle" font-weight="bold">{lab}</text>')
