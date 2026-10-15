@@ -1,11 +1,14 @@
 """오답 문제지 정답·풀이(A4) HTML 생성기.
 
-python3 build_answers.py  ->  answers.html  (Chromium으로 answers.pdf 출력)
+python3 build_answers.py  ->  answers.html  (node render_pdf.js answers.html answers.pdf 로 출력)
 """
+
+import re
 
 from build_worksheet import BOX, fr, mx
 
-X = '<span class="op">×</span>'
+X = '<span class="op x">×</span>'
+EQ = '<span class="op">=</span>'
 LT = '<span class="op">&lt;</span>'
 GT = '<span class="op">&gt;</span>'
 
@@ -45,7 +48,7 @@ A.append(("08", f"{mx(69, 1, 3)} km", [
     f"16과 6을 2로 약분하면 {fr(8, 7)} {X} {fr(13, 3)} = {fr(104, 21)} km",
     f"2주일 = 14일이에요. {fr(104, 21)} {X} 14 에서 21과 14를 7로 약분하면 {fr(104, 3)} {X} 2 = {fr(208, 3)}",
     f"{fr(208, 3)} = <b>{mx(69, 1, 3)} km</b> (208 ÷ 3 = 69 나머지 1)",
-], f"10분을 {fr(10, 100)}시간으로 바꾸면 틀려요. 1시간은 60분이므로 10분은 {fr(10, 60)}시간이에요. 2주일도 2일이 아니라 14일!"))
+], f"10분을 {fr(10, 100)}시간으로 바꾸면 틀려요. 1시간은 60분이므로 10분은 {fr(10, 60)}시간이에요. 2주일은 2일이 아니라 14일이에요."))
 
 A.append(("09", f"{fr(7, 9)} m", [
     f"ㄱ부터 ㅁ까지 전체 길이가 {mx(4, 2, 3)} m이고, 똑같이 6칸으로 나뉘어 있어요.",
@@ -103,7 +106,7 @@ A.append(("17", "60개", [
     f"하루 동안 처음 빵의 {fr(3, 4)}을 팔았으니 남은 빵은 처음의 1 − {fr(3, 4)} = {fr(1, 4)}이에요.",
     f"처음 빵의 {fr(1, 4)}이 15개예요.",
     "4칸 중 1칸이 15개이니까 4칸은 15 × 4 = <b>60개</b>",
-    f"확인: 60 {X} {fr(3, 4)} = 45개 팔고, 60 − 45 = 15개 남아요. ✓",
+    f"확인: 60 {X} {fr(3, 4)} = 45개 팔고, 60 − 45 = 15개 남아요.",
 ], f"15개는 판 빵이 아니라 남은 빵이에요. 남은 빵이 처음의 몇 분의 몇인지 먼저 구해요."))
 
 A.append(("18", "48명", [
@@ -134,23 +137,30 @@ header .t2 { font-size: 18pt; font-weight: bold; margin-top: 1mm; }
 .fr > span:last-child { padding: 0 0.15em; }
 .mx { white-space: nowrap; }
 .mx > .fr { margin-left: 0.02em; }
-.op { font-family: 'DejaVu Sans', sans-serif; font-size: 0.95em; margin: 0 0.25em; }
+.op { margin: 0 0.25em; }
+.op.x { font-size: 0.85em; }
 .box { display: inline-block; width: 1.1em; height: 1.25em; border: 1.4px solid #000; vertical-align: middle; }
-.quick { border: 1.5px solid #1d6b4f; border-radius: 2mm; padding: 3mm 4mm; margin-bottom: 6mm; break-inside: avoid; }
+.quick { border: 1.2px solid #1d6b4f; padding: 3mm 4mm; margin-bottom: 6mm; break-inside: avoid; }
 .quick h2 { font-size: 12pt; color: #1d6b4f; margin: 0 0 2mm; }
 .quick table { width: 100%; border-collapse: collapse; font-size: 11pt; }
 .quick td { padding: 1.6mm 2mm; border-bottom: 1px dotted #bbb; vertical-align: middle; }
 .quick td.n { color: #1d6b4f; font-weight: bold; width: 9mm; }
-.sol { display: inline-block; width: 100%; vertical-align: top; border-top: 1px dashed #bbb; padding: 5mm 0 4mm; }
+.sol { break-inside: avoid; border-top: 1px dashed #bbb; padding: 5mm 0 4mm; }
 .head { display: flex; align-items: center; gap: 3mm; margin-bottom: 2mm; }
 .num { font-size: 17pt; font-weight: bold; color: #1d6b4f; line-height: 1; min-width: 9mm; }
-.ans { font-size: 12pt; font-weight: bold; background: #e6f2ec; border: 1.2px solid #1d6b4f; border-radius: 1.5mm; padding: 0.5mm 3mm; }
+.ans { font-size: 12pt; font-weight: bold; background: #e6f2ec; border: 1.2px solid #1d6b4f; padding: 0.5mm 3mm; }
 ol { margin: 0 0 0 11.5mm; padding-left: 5mm; font-size: 11.5pt; line-height: 2.4; }
 ol li { margin-bottom: 1mm; }
 ol li { padding-left: 1mm; }
-.tip { margin: 2mm 0 0 11.5mm; font-size: 10.5pt; line-height: 2.1; background: #fff7e0; border-left: 3px solid #e0a800; padding: 1mm 3mm; }
+.tip { margin: 2mm 0 0 11.5mm; font-size: 10.5pt; line-height: 2.1; background: #fff7e0; border: 1px solid #ecd28a; padding: 1mm 3mm; }
 .tip b.k { color: #9a6b00; }
 """
+
+
+def sym(t):
+    """본문 글자 사이의 ×와 =도 같은 기호 모양·간격으로."""
+    t = re.sub(r'(?<!">)×', X, t)
+    return re.sub(r'(?<![a-z]) ?=(?!")(?! ?<span class="op">) ?', f' {EQ} ', t)
 
 
 def main():
@@ -162,16 +172,17 @@ def main():
         quick_rows.append(f"<tr>{cells}</tr>")
     sols = []
     for num, ans, steps, tip in A:
-        lis = "".join(f"<li>{s}</li>" for s in steps)
+        lis = "".join(f"<li>{sym(s)}</li>" for s in steps)
+        tip = sym(tip)
         sols.append(
             f'<div class="sol"><div class="head"><span class="num">{num}</span>'
             f'<span class="ans">정답 {ans}</span></div><ol>{lis}</ol>'
-            f'<div class="tip"><b class="k">이것만은 조심!</b> {tip}</div></div>'
+            f'<div class="tip"><b class="k">조심!</b> {tip}</div></div>'
         )
     html = (
         '<!doctype html><html lang="ko"><head><meta charset="utf-8">'
         f'<title>분수의 곱셈 오답 정답지</title><style>{CSS}</style></head><body>'
-        '<header><div class="t1">5학년 2학기 · 2. 분수의 곱셈</div><div class="t2">오답 다시 풀기 — 정답과 풀이</div></header>'
+        '<header><div class="t1">5학년 2학기 · 2. 분수의 곱셈</div><div class="t2">오답 다시 풀기 · 정답과 풀이</div></header>'
         f'<div class="quick"><h2>빠른 정답</h2><table>{"".join(quick_rows)}</table></div>'
         + "".join(sols)
         + "</body></html>"

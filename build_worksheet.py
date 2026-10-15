@@ -1,6 +1,6 @@
 """5학년 2학기 '2. 분수의 곱셈' 오답 문제지(A4) HTML 생성기.
 
-python3 build_worksheet.py  ->  worksheet.html  (Chromium으로 worksheet.pdf 출력)
+python3 build_worksheet.py  ->  worksheet.html  (node render_pdf.js worksheet.html worksheet.pdf nofooter 로 출력)
 """
 
 
@@ -120,7 +120,7 @@ P.append(("16", f"어떤 수에 {fr(2, 5)}를 곱해야 할 것을 잘못하여 
 P.append(("17", f"빵집에 빵이 진열되어 있습니다. 하루 동안 처음 있던 빵의 {fr(3, 4)}을 팔고, 남은 빵의 개수를 세어 보니 모두 15개였습니다. 처음에 진열되어 있던 빵은 모두 몇 개입니까?", "", "개"))
 P.append(("18", f"윤서네 반은 한 묶음에 12장씩 들어 있는 색종이 다섯 묶음을 샀습니다. 반 학생들이 한 장씩 나누어 가졌더니 전체의 {fr(1, 5)}이 남았다면, 윤서네 반 학생 수는 모두 몇 명입니까?", "", "명"))
 P.append(("19", f"{BOX} 안에 들어갈 수 있는 자연수는 모두 몇 개입니까?",
-          f'<div class="ineq"><span class="mx">{BOX}{fr(2, 5)}</span><span class="op">&lt;</span>{mx(2, 5, 9)}<span class="op">×</span>{mx(1, 4, 5)}</div>', "개"))
+          f'<div class="ineq"><span class="mx">{BOX}{fr(2, 5)}</span><span class="op">&lt;</span>{mx(2, 5, 9)}<span class="op x">×</span>{mx(1, 4, 5)}</div>', "개"))
 
 # 풀이 공간 비율: 고르기 문제는 좁게, 여러 단계 문제는 넓게
 WEIGHT = {"05": 2, "06": 2, "09": 2.4, "10": 2.4, "11": 2.6, "12": 2.6, "08": 3.0, "13": 3.6, "15": 3.6, "18": 3.6}
@@ -145,7 +145,7 @@ body { margin: 0; font-family: 'Noto Sans CJK KR', 'Noto Sans KR', 'Malgun Gothi
 header { border-bottom: 2.5px solid #1d6b4f; padding-bottom: 3mm; margin-bottom: 4mm; display: flex; justify-content: space-between; align-items: flex-end; }
 header .t1 { font-size: 11pt; color: #1d6b4f; font-weight: bold; }
 header .t2 { font-size: 18pt; font-weight: bold; margin-top: 1mm; }
-header .info { font-size: 11pt; white-space: nowrap; }
+header .info { font-size: 11pt; white-space: nowrap; line-height: 2; text-align: right; }
 header .info span { display: inline-block; border-bottom: 1px solid #000; width: 28mm; margin-left: 2mm; }
 .small-head { font-size: 10pt; color: #1d6b4f; font-weight: bold; border-bottom: 1.5px solid #1d6b4f; padding-bottom: 2mm; margin-bottom: 4mm; display: flex; justify-content: space-between; }
 .grid { flex: 1; display: grid; grid-template-columns: 1fr; grid-template-rows: repeat(4, 1fr); min-height: 0; }
@@ -159,18 +159,19 @@ header .info span { display: inline-block; border-bottom: 1px solid #000; width:
 .fr > span:last-child { padding: 0 0.15em; }
 .mx { white-space: nowrap; }
 .mx > .fr { margin-left: 0.02em; }
-.op { font-family: 'DejaVu Sans', sans-serif; font-size: 0.95em; margin: 0 0.35em; }
+.op { margin: 0 0.3em; }
+.op.x { font-size: 0.85em; }
 .box { display: inline-block; width: 1.1em; height: 1.25em; border: 1.4px solid #000; vertical-align: middle; }
-.opts { font-size: 11.5pt; line-height: 2.1; margin: 1.5mm 0 0 11.5mm; padding: 1.5mm 3mm; border: 1px solid #999; border-radius: 2mm; display: inline-block; min-width: 90mm; }
+.opts { font-size: 11.5pt; line-height: 2.1; margin: 1.5mm 0 0 11.5mm; padding: 1.5mm 3mm; border: 1px solid #999; display: inline-block; min-width: 90mm; }
 .choices { margin: 2mm 0 0 11.5mm; font-size: 12.5pt; display: flex; gap: 12mm; flex-wrap: wrap; }
-.ineq { margin: 3mm 0 0 11.5mm; font-size: 13pt; padding: 2mm 4mm; border: 1px solid #999; border-radius: 2mm; display: inline-block; align-self: flex-start; min-width: 90mm; }
+.ineq { margin: 3mm 0 0 11.5mm; font-size: 13pt; padding: 2mm 4mm; border: 1px solid #999; display: inline-block; align-self: flex-start; min-width: 90mm; }
 .opts { align-self: flex-start; }
 .fig { margin: 2mm 0 0 8mm; zoom: 1.3; }
 .fig svg text { font-family: 'Noto Sans CJK KR', 'Noto Sans KR', sans-serif; }
 .work { flex: 1; }
 .ans { text-align: right; font-size: 12pt; }
 .paren { display: inline-flex; justify-content: space-between; width: 45mm; }
-footer { text-align: center; font-size: 9pt; color: #777; margin-top: 2mm; }
+footer { text-align: center; font-size: 9pt; color: #333; margin-top: 2mm; }
 """
 
 
@@ -181,14 +182,14 @@ def main():
             head = (
                 '<header><div><div class="t1">5학년 2학기 · 2. 분수의 곱셈</div>'
                 '<div class="t2">오답 다시 풀기</div></div>'
-                '<div class="info">날짜<span></span></div></header>'
+                '<div class="info">이름<span></span><br>날짜<span></span></div></header>'
             )
         else:
-            head = '<div class="small-head"><span>5학년 2학기 · 2. 분수의 곱셈 — 오답 다시 풀기</span></div>'
+            head = '<div class="small-head"><span>5학년 2학기 · 2. 분수의 곱셈 · 오답 다시 풀기</span></div>'
         rows = " ".join(f"{WEIGHT.get(p[0], 3)}fr" for p in probs)
         cls = f'grid" style="grid-template-rows: {rows}'
         body = "".join(render_problem(*p, top=(k == 0)) for k, p in enumerate(probs))
-        pages.append(f'<section class="page">{head}<div class="{cls}">{body}</div><footer>{i + 1} / {len(PAGES)}</footer></section>')
+        pages.append(f'<section class="page">{head}<div class="{cls}">{body}</div><footer>{i + 1}</footer></section>')
     html = (
         '<!doctype html><html lang="ko"><head><meta charset="utf-8">'
         f'<title>분수의 곱셈 오답 문제지</title><style>{CSS}</style></head><body>'
