@@ -20,6 +20,10 @@ def bfr(n=None, d=None):
 
 # ---------- SVG ----------
 BLUE, BLUE_D, ORANGE, GRAY = "#9cc3e8", "#3f78b5", "#f6c38b", "#e8e8e8"
+# 흑백 인쇄에서도 구분되도록 파랑 칸에 빗금
+HATCH = ('<defs><pattern id="wbh" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">'
+         f'<rect width="6" height="6" fill="{BLUE}"/><line x1="0" y1="0" x2="0" y2="6" stroke="#2f5f94" stroke-width="1.6"/>'
+         '</pattern></defs>')
 
 
 def bar(parts, shade, total=None, shade2=0, cell_labels=None, w=330, h=34, note=None):
@@ -27,9 +31,9 @@ def bar(parts, shade, total=None, shade2=0, cell_labels=None, w=330, h=34, note=
     cw = w / parts
     top = 20 if cell_labels else 6
     H = top + h + (40 if total else 8)
-    s = [f'<svg viewBox="0 0 {w + 20} {H}" width="{w + 20}" height="{H}">']
+    s = [f'<svg viewBox="0 0 {w + 20} {H}" width="{w + 20}" height="{H}">', HATCH]
     for i in range(parts):
-        fill = BLUE if i < shade else ORANGE if i < shade + shade2 else "#fff"
+        fill = "url(#wbh)" if i < shade else ORANGE if i < shade + shade2 else "#fff"
         s.append(f'<rect x="{10 + i * cw}" y="{top}" width="{cw}" height="{h}" fill="{fill}" stroke="#000" stroke-width="1.2"/>')
         if cell_labels:
             s.append(f'<text x="{10 + i * cw + cw / 2}" y="{top - 6}" font-size="12" text-anchor="middle">{cell_labels[i]}</text>')
@@ -205,9 +209,13 @@ L.append(lesson("2", "단위를 바꾸면 쉬워요", "1m의 1/5은 몇 cm?", "0
     f'<div class="ox blk"><div class="pt">맞으면 ○, 틀리면 ×</div>'
     f'<div>(7) 1m의 {fr(1, 5)}은 50cm야. (　　)　　(8) 1kg의 {fr(1, 4)}은 250g이야. (　　)</div>'
     f'<div>(9) 1시간의 {fr(1, 2)}은 40분이야. (　　)　(10) 1km의 {fr(1, 2)}은 200m야. (　　)</div></div>',
+    words([
+        (f"1시간의 {fr(1, 4)} 동안 책을 읽었어요. 책을 읽은 시간은 몇 분일까요?", "분"),
+        (f"물 1L의 {fr(3, 5)}를 마셨어요. 마신 물은 몇 mL일까요?", "mL"),
+    ], start=11, title=None, space=12),
 ])))
 ANS.append(("2", ["따라 해 봐요: 1000, 1000 × 1/4 = 250g / 60, 60 × 1/3 = 20분", "(1) 75", "(2) 500", "(3) 300",
-                  "(4) 400", "(5) 15", "(6) 50", "(7) × (20cm)", "(8) ○", "(9) × (30분)", "(10) × (500m)"]))
+                  "(4) 400", "(5) 15", "(6) 50", "(7) × (20cm)", "(8) ○", "(9) × (30분)", "(10) × (500m)", "(11) 60 × 1/4 = 15분", "(12) 1000 × 3/5 = 600mL"]))
 
 # 3
 L.append(lesson("3", "'분'을 '시간'으로 바꿔요", "10분은 몇 시간일까?", "08", "".join([
@@ -219,11 +227,16 @@ L.append(lesson("3", "'분'을 '시간'으로 바꿔요", "10분은 몇 시간�
     rule(f"<b>■분 {EQ} {fr('■', 60)}시간</b>　(분모는 항상 <b>60</b>, 그다음 약분해요)"),
     careful(f"10분을 {fr(10, 100)}시간으로 쓰면 틀려요. 1시간은 <b>60분</b>!"),
     follow(f"20분 {EQ} {bfr(20, None)}시간 {EQ} {bfr()}시간<br>1시간 30분 {EQ} 1시간 + {bfr(30, None)}시간 {EQ} 1{bfr()}시간"),
-    drills([f"30분 {EQ} {BL}시간", f"15분 {EQ} {BL}시간", f"40분 {EQ} {BL}시간",
-            f"45분 {EQ} {BL}시간", f"1시간 20분 {EQ} {BL}시간", f"2시간 10분 {EQ} {BL}시간"]),
+    drills([f"30분 {EQ} {bfr()}시간", f"15분 {EQ} {bfr()}시간", f"40분 {EQ} {bfr()}시간",
+            f"45분 {EQ} {bfr()}시간", f"1시간 20분 {EQ} {BL}{bfr()}시간", f"2시간 10분 {EQ} {BL}{bfr()}시간"]),
+    words([
+        ("한 시간에 3km를 걷는 빠르기로 1시간 20분 동안 걸으면 몇 km를 걸을까요?", "km"),
+        (f"한 시간에 {mx(1, 1, 2)}km를 걷는 빠르기로 40분 동안 걸으면 몇 km를 걸을까요?", "km"),
+    ], start=7, title=None, space=11),
 ])))
 ANS.append(("3", ["따라 해 봐요: 20/60 = 1/3시간 / 30/60 → 1과 1/2시간", "(1) 1/2", "(2) 1/4", "(3) 2/3",
-                  "(4) 3/4", "(5) 1과 1/3", "(6) 2와 1/6"]))
+                  "(4) 3/4", "(5) 1과 1/3", "(6) 2와 1/6",
+                  "(7) 1과 1/3 × 3 = 4/3 × 3 = 4km", "(8) 40분 = 2/3시간, 3/2 × 2/3 = 1km"]))
 
 # 4
 L.append(lesson("4", "(자연수) × (분수)는 약분 먼저!", "큰 수도 쉽게 계산해요", "01, 13, 14", "".join([
@@ -235,8 +248,12 @@ L.append(lesson("4", "(자연수) × (분수)는 약분 먼저!", "큰 수도 �
     follow(f"24 {X} {fr(5, 6)} → 24와 6을 {BL}로 약분 → {BL} {X} 5 {EQ} {BL}"),
     drills([f"14 {X} {fr(3, 7)} {EQ} {BL}", f"24 {X} {fr(5, 6)} {EQ} {BL}", f"36 {X} {fr(7, 9)} {EQ} {BL}",
             f"15 {X} {fr(4, 5)} {EQ} {BL}", f"60 {X} {fr(3, 4)} {EQ} {BL}", f"25 {X} {fr(3, 5)} {EQ} {BL}"]),
+    words([
+        (f"40km를 가는 데 전체의 {fr(3, 8)}은 전철을 탔어요. 전철을 타고 간 거리는 몇 km일까요?", "km"),
+        (f"길이가 90cm인 철사의 {fr(2, 5)}를 미술 시간에 썼어요. 쓴 철사는 몇 cm일까요?", "cm"),
+    ], start=7, title=None, space=11),
 ])))
-ANS.append(("4", ["따라 해 봐요: 6으로 약분 → 4 × 5 = 20", "(1) 6", "(2) 20", "(3) 28", "(4) 12", "(5) 45", "(6) 15"]))
+ANS.append(("4", ["따라 해 봐요: 6으로 약분 → 4 × 5 = 20", "(1) 6", "(2) 20", "(3) 28", "(4) 12", "(5) 45", "(6) 15", "(7) 40 × 3/8 = 15km", "(8) 90 × 2/5 = 36cm"]))
 
 # 5
 L.append(lesson("5", "대분수는 가분수로 바꿔서 곱해요", f"{mx(1, 4, 7)}은 7조각짜리가 몇 조각?", "01, 08, 19", "".join([
@@ -321,7 +338,7 @@ L.append(lesson("9", "남은 양으로 처음 양 구하기", "남은 것이 전
             f'② 4칸 중 1칸이 15개<br>③ 4칸은 15 {X} 4 {EQ} <b>60개</b></div></div>'),
     careful("15개는 판 빵이 아니라 <b>남은 빵</b>이에요."),
     follow(f"색종이 60장을 학생들이 한 장씩 가졌더니 전체의 {fr(1, 5)}이 남았어요. 학생은 몇 명?<br>"
-           f"① 남은 색종이: 60 {X} {fr(1, 5)} {EQ} {BL}장　② 가져간 색종이: 60 − {BL} {EQ} {BL}장　③ 학생 수: {BL}명"),
+           f"① 남은 색종이: 60 {X} {fr(1, 5)} {EQ} {BL}장<br>② 가져간 색종이: 60 − {BL} {EQ} {BL}장<br>③ 학생 수: {BL}명"),
     words([
         (f"사탕의 {fr(2, 3)}를 먹었더니 10개가 남았어요. 처음 사탕은 몇 개?", "개"),
         (f"스티커의 {fr(3, 5)}를 썼더니 8장이 남았어요. 처음 스티커는 몇 장?", "장"),
@@ -437,7 +454,7 @@ table.toc td.c { width: 22mm; }
 .row > div:first-child { flex: none; }
 .ex { margin-top: 2mm; line-height: 2; }
 .steps > div { line-height: 2.1; }
-.rule { background: #e6f2ec; border-radius: 2mm; padding: 2.5mm 4mm; margin-bottom: 3.5mm; line-height: 2; }
+.rule { background: #d6ebe0; border-left: 4px solid #1d6b4f; border-radius: 2mm; padding: 2.5mm 4mm; margin-bottom: 3.5mm; line-height: 2; }
 .rt { display: inline-block; background: #1d6b4f; color: #fff; font-size: 9.5pt; font-weight: bold; border-radius: 1mm; padding: 0 2mm; margin-right: 3mm; }
 .careful { background: #fff7e0; border-left: 3px solid #e0a800; padding: 2mm 4mm; margin-bottom: 3.5mm; line-height: 1.9; }
 .careful b:first-child { color: #9a6b00; }
@@ -458,10 +475,19 @@ table.toc td.c { width: 22mm; }
 .figq { display: inline-block; width: 49%; vertical-align: top; margin-bottom: 2mm; }
 .answers { break-before: page; }
 .answers h2 { font-size: 17pt; border-bottom: 2.5px solid #1d6b4f; padding-bottom: 3mm; margin: 0 0 4mm; }
-.ag { display: inline-block; width: 100%; break-inside: avoid; margin-bottom: 3mm; }
+.abody { columns: 2; column-gap: 9mm; }
+.ag { display: inline-block; width: 100%; break-inside: avoid; margin-bottom: 4mm; }
 .ag .h { font-weight: bold; color: #1d6b4f; }
 .ag .items { line-height: 2.2; font-size: 10.5pt; padding-left: 4mm; }
 """
+
+
+def fmt(t):
+    """정답 텍스트의 'A와 B/C', 'B/C', '×'를 본문과 같은 수식 모양으로."""
+    import re
+    t = re.sub(r"(\d+)[와과] (\d+)/(\d+)", lambda m: mx(*m.groups()), t)
+    t = re.sub(r"(?<![\d<])(\d+)/(\d+)", lambda m: fr(*m.groups()), t)
+    return t.replace("×", X).replace("□", BOX)
 
 
 def main():
@@ -478,9 +504,9 @@ def main():
         '⑤ 다 끝나면 <b>실력 확인</b>을 풀고, 오답 문제지를 다시 풀어 봐요.</div>'
         f'<table class="toc">{toc}</table></div>'
     )
-    ans = '<section class="answers"><h2>정답</h2>' + "".join(
+    ans = '<section class="answers"><h2>정답</h2><div class="abody">' + "".join(
         f'<div class="ag"><div class="h">{("" if n == "실력 확인" else "")}{n if n == "실력 확인" else n + "차시"}</div>'
-        f'<div class="items">{"<br>".join(items)}</div></div>' for n, items in ANS) + "</section>"
+        f'<div class="items">{"<br>".join(fmt(t) for t in items)}</div></div>' for n, items in ANS) + "</div></section>"
     html = (
         '<!doctype html><html lang="ko"><head><meta charset="utf-8">'
         f'<title>분수의 곱셈 개념 문제집</title><style>{CSS}</style></head><body>'
