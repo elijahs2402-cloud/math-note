@@ -144,8 +144,10 @@ header .t2 { font-size: 18pt; font-weight: bold; margin-top: 1mm; }
 .quick h2 { font-size: 12pt; color: #1d6b4f; margin: 0 0 2mm; }
 .quick table { width: 100%; border-collapse: collapse; font-size: 11pt; }
 .quick td { padding: 1.6mm 2mm; border-bottom: 1px dotted #bbb; vertical-align: middle; }
+.quick tr:last-child td { border-bottom: none; }
 .quick td.n { color: #1d6b4f; font-weight: bold; width: 9mm; }
 .sol { break-inside: avoid; border-top: 1px dashed #bbb; padding: 5mm 0 4mm; }
+.quick + .sol { border-top: none; }
 .head { display: flex; align-items: center; gap: 3mm; margin-bottom: 2mm; }
 .num { font-size: 17pt; font-weight: bold; color: #1d6b4f; line-height: 1; min-width: 9mm; }
 .ans { font-size: 12pt; font-weight: bold; background: #e6f2ec; border: 1.2px solid #1d6b4f; padding: 0.5mm 3mm; }
