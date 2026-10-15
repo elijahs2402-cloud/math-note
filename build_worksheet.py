@@ -27,9 +27,9 @@ def svg_frac(x, y, n, d, size=15, anchor="middle"):
 
 
 def number_line(parts, end_n, end_d, target):
-    W, x0, x1, y = 330, 20, 310, 30
+    W, x0, x1, y = 330, 20, 310, 22
     step = (x1 - x0) / parts
-    s = [f'<svg viewBox="0 0 {W} 150" width="{W}" height="150">']
+    s = [f'<svg viewBox="0 0 {W} 128" width="{W}" height="128">']
     s.append(f'<line x1="{x0}" y1="{y}" x2="{x1}" y2="{y}" stroke="#000" stroke-width="1.6"/>')
     for i in range(parts + 1):
         x = x0 + i * step
@@ -42,16 +42,16 @@ def number_line(parts, end_n, end_d, target):
     s.append(f'<text x="{x0}" y="{y + 32}" font-size="15" text-anchor="middle">0</text>')
     s.append(svg_frac(x1, y + 40, end_n, end_d))
     tx = x0 + target * step
-    s.append(f'<line x1="{tx}" y1="{y + 78}" x2="{tx}" y2="{y + 14}" stroke="#000" stroke-width="1.4"/>')
+    s.append(f'<line x1="{tx}" y1="{y + 64}" x2="{tx}" y2="{y + 14}" stroke="#000" stroke-width="1.4"/>')
     s.append(f'<path d="M{tx - 5},{y + 22} L{tx},{y + 13} L{tx + 5},{y + 22}" fill="none" stroke="#000" stroke-width="1.4"/>')
-    s.append(f'<rect x="{tx - 22}" y="{y + 78}" width="44" height="40" fill="#fff" stroke="#000" stroke-width="1.4"/>')
+    s.append(f'<rect x="{tx - 22}" y="{y + 64}" width="44" height="40" fill="#fff" stroke="#000" stroke-width="1.4"/>')
     s.append("</svg>")
     return "".join(s)
 
 
 def fig09():
     W, x0, x1, y = 340, 25, 315, 70
-    step = (x1 - x0) / 8
+    step = (x1 - x0) / 6
     s = [f'<svg viewBox="0 0 {W} 130" width="{W}" height="130">']
     # 전체 길이 호 + 4 2/3 m
     s.append(f'<path d="M{x0},{y - 6} Q{(x0 + x1) / 2},{y - 50} {x1},{y - 6}" fill="none" stroke="#555" stroke-width="1.1"/>')
@@ -60,15 +60,15 @@ def fig09():
     s.append(svg_frac(cx - 6, y - 53, 2, 3, size=13))
     s.append(f'<text x="{cx + 14}" y="{y - 46}" font-size="16" text-anchor="middle">m</text>')
     s.append(f'<line x1="{x0}" y1="{y}" x2="{x1}" y2="{y}" stroke="#000" stroke-width="1.8"/>')
-    for i in range(9):
+    for i in range(7):
         x = x0 + i * step
         s.append(f'<line x1="{x}" y1="{y - 7}" x2="{x}" y2="{y + 7}" stroke="#000" stroke-width="1.5"/>')
-        if i < 8:
+        if i < 6:
             s.append(
                 f'<path d="M{x},{y + 3} Q{x + step / 2},{y + 18} {x + step},{y + 3}" '
                 f'fill="none" stroke="#777" stroke-width="0.9"/>'
             )
-    for i, lab in ((0, "ㄱ"), (3, "ㄴ")):
+    for i, lab in ((0, "ㄱ"), (1, "ㄴ"), (6, "ㅁ")):
         x = x0 + i * step
         s.append(f'<circle cx="{x}" cy="{y}" r="3.5" fill="#000"/>')
         s.append(f'<text x="{x}" y="{y + 32}" font-size="16" text-anchor="middle" font-weight="bold">{lab}</text>')
@@ -79,9 +79,12 @@ def fig09():
 def fig10():
     W, x0, y, h = 340, 20, 15, 34
     cell = 30
-    s = [f'<svg viewBox="0 0 {W} 110" width="{W}" height="110">']
+    s = [f'<svg viewBox="0 0 {W} 110" width="{W}" height="110">',
+         '<defs><pattern id="hatch" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">'
+         '<rect width="6" height="6" fill="#6f9fd0"/><line x1="0" y1="0" x2="0" y2="6" stroke="#1f4f80" stroke-width="2"/>'
+         '</pattern></defs>']
     for i in range(10):
-        fill = "#9fc3e6" if i < 9 else "#fff"
+        fill = "url(#hatch)" if i < 9 else "#fff"
         s.append(f'<rect x="{x0 + i * cell}" y="{y}" width="{cell}" height="{h}" fill="{fill}" stroke="#000" stroke-width="1.3"/>')
     xe = x0 + 10 * cell
     yb = y + h + 8
@@ -119,11 +122,14 @@ P.append(("18", f"윤서네 반은 한 묶음에 12장씩 들어 있는 색종�
 P.append(("19", "□ 안에 들어갈 수 있는 자연수는 모두 몇 개입니까?",
           f'<div class="ineq"><span class="mx">{BOX}{fr(2, 5)}</span> &lt; {mx(2, 5, 9)} × {mx(1, 4, 5)}</div>', "개"))
 
+# 풀이 공간 비율: 고르기 문제는 좁게, 여러 단계 문제는 넓게
+WEIGHT = {"05": 2, "06": 2, "09": 2.4, "10": 2.4, "11": 2.6, "12": 2.6, "08": 3.6, "13": 3.6, "15": 3.6, "18": 3.6}
+
 PAGES = [P[i:i + 4] for i in range(0, len(P), 4)]
 
 
 def render_problem(num, text, extra, unit, top=False):
-    ans = "" if unit is None else f'<div class="ans">(&nbsp;<span class="blank"></span>{unit}&nbsp;)</div>'
+    ans = "" if unit is None else f'<div class="ans"><span class="paren"><span>(</span><span>{unit}&nbsp;)</span></span></div>'
     return (
         f'<div class="prob{" top" if top else ""}"><div class="q"><span class="num">{num}</span>'
         f'<div class="txt">{text}</div></div>{extra}<div class="work"></div>{ans}</div>'
@@ -134,7 +140,7 @@ CSS = """
 @page { size: A4; margin: 0; }
 * { box-sizing: border-box; }
 body { margin: 0; font-family: 'WenQuanYi Zen Hei', 'Malgun Gothic', 'Apple SD Gothic Neo', sans-serif; color: #000; }
-.page { width: 210mm; height: 297mm; padding: 12mm 12mm 10mm; page-break-after: always; display: flex; flex-direction: column; }
+.page { width: 210mm; height: 297mm; overflow: hidden; padding: 12mm 12mm 10mm; page-break-after: always; display: flex; flex-direction: column; }
 .page:last-child { page-break-after: auto; }
 header { border-bottom: 2.5px solid #1d6b4f; padding-bottom: 3mm; margin-bottom: 4mm; display: flex; justify-content: space-between; align-items: flex-end; }
 header .t1 { font-size: 11pt; color: #1d6b4f; font-weight: bold; }
@@ -142,26 +148,26 @@ header .t2 { font-size: 18pt; font-weight: bold; margin-top: 1mm; }
 header .info { font-size: 11pt; white-space: nowrap; }
 header .info span { display: inline-block; border-bottom: 1px solid #000; width: 28mm; margin-left: 2mm; }
 .small-head { font-size: 10pt; color: #1d6b4f; font-weight: bold; border-bottom: 1.5px solid #1d6b4f; padding-bottom: 2mm; margin-bottom: 4mm; display: flex; justify-content: space-between; }
-.grid { flex: 1; display: grid; grid-template-columns: 1fr; grid-template-rows: repeat(4, 1fr); }
+.grid { flex: 1; display: grid; grid-template-columns: 1fr; grid-template-rows: repeat(4, 1fr); min-height: 0; }
 .prob { border-top: 1px dashed #bbb; padding: 3mm 0 2mm; display: flex; flex-direction: column; position: relative; }
 .prob.top { border-top: none; padding-top: 0; }
 .q { display: flex; gap: 2.5mm; align-items: flex-start; }
 .num { font-size: 17pt; font-weight: bold; color: #1d6b4f; line-height: 1; min-width: 9mm; }
 .txt { font-size: 11.5pt; line-height: 2.05; word-break: keep-all; }
-.fr { display: inline-flex; flex-direction: column; align-items: center; vertical-align: middle; font-size: 0.9em; line-height: 1.1; margin: 0 0.12em; }
+.fr { display: inline-flex; flex-direction: column; align-items: center; vertical-align: middle; font-size: 1em; line-height: 1.05; margin: 0 0.15em; }
 .fr > span:first-child { border-bottom: 1.2px solid #000; padding: 0 0.15em; }
 .fr > span:last-child { padding: 0 0.15em; }
 .mx { white-space: nowrap; }
 .box { display: inline-block; width: 1.1em; height: 1.25em; border: 1.4px solid #000; vertical-align: middle; }
-.opts { font-size: 11.5pt; line-height: 2.1; margin: 1.5mm 0 0 11.5mm; padding: 1.5mm 3mm; border: 1px solid #999; border-radius: 2mm; display: inline-block; }
-.choices { margin: 2mm 0 0 11.5mm; font-size: 11.5pt; display: flex; gap: 5mm; flex-wrap: wrap; }
-.ineq { margin: 3mm 0 0 11.5mm; font-size: 13pt; padding: 2mm 4mm; border: 1px solid #999; border-radius: 2mm; display: inline-block; align-self: flex-start; }
+.opts { font-size: 11.5pt; line-height: 2.1; margin: 1.5mm 0 0 11.5mm; padding: 1.5mm 3mm; border: 1px solid #999; border-radius: 2mm; display: inline-block; min-width: 90mm; }
+.choices { margin: 2mm 0 0 11.5mm; font-size: 11.5pt; display: flex; gap: 12mm; flex-wrap: wrap; }
+.ineq { margin: 3mm 0 0 11.5mm; font-size: 13pt; padding: 2mm 4mm; border: 1px solid #999; border-radius: 2mm; display: inline-block; align-self: flex-start; min-width: 90mm; }
 .opts { align-self: flex-start; }
-.fig { margin: 2mm 0 0 8mm; }
+.fig { margin: 2mm 0 0 8mm; zoom: 1.3; }
 .fig svg text { font-family: 'WenQuanYi Zen Hei', sans-serif; }
 .work { flex: 1; }
 .ans { text-align: right; font-size: 12pt; }
-.blank { display: inline-block; width: 28mm; }
+.paren { display: inline-flex; justify-content: space-between; width: 45mm; }
 footer { text-align: center; font-size: 9pt; color: #777; margin-top: 2mm; }
 """
 
@@ -177,7 +183,8 @@ def main():
             )
         else:
             head = '<div class="small-head"><span>5학년 2학기 · 2. 분수의 곱셈 — 오답 다시 풀기</span></div>'
-        cls = "grid"
+        rows = " ".join(f"{WEIGHT.get(p[0], 3)}fr" for p in probs)
+        cls = f'grid" style="grid-template-rows: {rows}'
         body = "".join(render_problem(*p, top=(k == 0)) for k, p in enumerate(probs))
         pages.append(f'<section class="page">{head}<div class="{cls}">{body}</div><footer>{i + 1} / {len(PAGES)}</footer></section>')
     html = (
