@@ -475,10 +475,10 @@ table.toc td.c { width: 22mm; }
 .figq { display: inline-block; width: 49%; vertical-align: top; margin-bottom: 2mm; }
 .answers { break-before: page; }
 .answers h2 { font-size: 17pt; border-bottom: 2.5px solid #1d6b4f; padding-bottom: 3mm; margin: 0 0 4mm; }
-.abody { columns: 2; column-gap: 9mm; }
-.ag { display: inline-block; width: 100%; break-inside: avoid; margin-bottom: 4mm; }
+.ag { break-inside: avoid; margin-bottom: 6mm; }
 .ag .h { font-weight: bold; color: #1d6b4f; }
-.ag .items { line-height: 2.2; font-size: 10.5pt; padding-left: 4mm; }
+.ag .items { display: grid; grid-template-columns: 1fr 1fr; column-gap: 8mm; line-height: 2.7; font-size: 11pt; padding-left: 4mm; }
+.ag .items .w { grid-column: 1 / -1; }
 """
 
 
@@ -488,6 +488,12 @@ def fmt(t):
     t = re.sub(r"(\d+)[와과] (\d+)/(\d+)", lambda m: mx(*m.groups()), t)
     t = re.sub(r"(?<![\d<])(\d+)/(\d+)", lambda m: fr(*m.groups()), t)
     return t.replace("×", X).replace("□", BOX)
+
+
+def item(t):
+    """짧은 답은 2칸 격자, 긴 풀이는 한 줄 전체."""
+    cls = ' class="w"' if len(t) > 28 or t.startswith("따라") else ""
+    return f"<div{cls}>{fmt(t)}</div>"
 
 
 def main():
@@ -506,7 +512,7 @@ def main():
     )
     ans = '<section class="answers"><h2>정답</h2><div class="abody">' + "".join(
         f'<div class="ag"><div class="h">{("" if n == "실력 확인" else "")}{n if n == "실력 확인" else n + "차시"}</div>'
-        f'<div class="items">{"<br>".join(fmt(t) for t in items)}</div></div>' for n, items in ANS) + "</div></section>"
+        f'<div class="items">{"".join(item(t) for t in items)}</div></div>' for n, items in ANS) + "</div></section>"
     html = (
         '<!doctype html><html lang="ko"><head><meta charset="utf-8">'
         f'<title>분수의 곱셈 개념 문제집</title><style>{CSS}</style></head><body>'
