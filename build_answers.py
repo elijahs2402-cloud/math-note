@@ -139,15 +139,16 @@ header .t2 { font-size: 18pt; font-weight: bold; margin-top: 1mm; }
 .quick { border: 1.5px solid #1d6b4f; border-radius: 2mm; padding: 3mm 4mm; margin-bottom: 6mm; break-inside: avoid; }
 .quick h2 { font-size: 12pt; color: #1d6b4f; margin: 0 0 2mm; }
 .quick table { width: 100%; border-collapse: collapse; font-size: 11pt; }
-.quick td { padding: 0.8mm 2mm; border-bottom: 1px dotted #bbb; vertical-align: middle; }
+.quick td { padding: 1.6mm 2mm; border-bottom: 1px dotted #bbb; vertical-align: middle; }
 .quick td.n { color: #1d6b4f; font-weight: bold; width: 9mm; }
-.sol { display: inline-block; width: 100%; vertical-align: top; border-top: 1px dashed #bbb; padding: 3.5mm 0 2.5mm; }
+.sol { display: inline-block; width: 100%; vertical-align: top; border-top: 1px dashed #bbb; padding: 5mm 0 4mm; }
 .head { display: flex; align-items: center; gap: 3mm; margin-bottom: 2mm; }
 .num { font-size: 17pt; font-weight: bold; color: #1d6b4f; line-height: 1; min-width: 9mm; }
 .ans { font-size: 12pt; font-weight: bold; background: #e6f2ec; border: 1.2px solid #1d6b4f; border-radius: 1.5mm; padding: 0.5mm 3mm; }
-ol { margin: 0 0 0 11.5mm; padding-left: 5mm; font-size: 11.5pt; line-height: 1.9; }
+ol { margin: 0 0 0 11.5mm; padding-left: 5mm; font-size: 11.5pt; line-height: 2.4; }
+ol li { margin-bottom: 1mm; }
 ol li { padding-left: 1mm; }
-.tip { margin: 2mm 0 0 11.5mm; font-size: 10.5pt; line-height: 1.8; background: #fff7e0; border-left: 3px solid #e0a800; padding: 1mm 3mm; }
+.tip { margin: 2mm 0 0 11.5mm; font-size: 10.5pt; line-height: 2.1; background: #fff7e0; border-left: 3px solid #e0a800; padding: 1mm 3mm; }
 .tip b.k { color: #9a6b00; }
 """
 
