@@ -96,11 +96,11 @@ def nl(parts, end, target=None, box_at=None, w=330):
 
 def segment(parts, total_html_svg, labels, w=330):
     """선분 parts등분. labels = {눈금번호: 글자}."""
-    x0, x1, y = 20, w - 20, 50
+    x0, x1, y = 20, w - 20, 62
     step = (x1 - x0) / parts
-    s = [f'<svg viewBox="0 0 {w} 100" width="{w}" height="100">']
+    s = [f'<svg viewBox="0 0 {w} 112" width="{w}" height="112">']
     s.append(f'<path d="M{x0},{y - 6} Q{(x0 + x1) / 2},{y - 34} {x1},{y - 6}" fill="none" stroke="#555" stroke-width="1.1"/>')
-    s.append(total_html_svg((x0 + x1) / 2, 4))
+    s.append(total_html_svg((x0 + x1) / 2, 12))
     s.append(f'<line x1="{x0}" y1="{y}" x2="{x1}" y2="{y}" stroke="#000" stroke-width="1.7"/>')
     for i in range(parts + 1):
         x = x0 + i * step
