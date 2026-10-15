@@ -179,7 +179,7 @@ def main():
             head = (
                 '<header><div><div class="t1">5학년 2학기 · 2. 분수의 곱셈</div>'
                 '<div class="t2">오답 다시 풀기</div></div>'
-                '<div class="info">날짜<span></span>&nbsp;&nbsp;이름<span></span></div></header>'
+                '<div class="info">날짜<span></span></div></header>'
             )
         else:
             head = '<div class="small-head"><span>5학년 2학기 · 2. 분수의 곱셈 — 오답 다시 풀기</span></div>'
