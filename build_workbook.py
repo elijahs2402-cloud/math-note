@@ -358,7 +358,7 @@ L.append(lesson("10", "어떤 수를 잘못 계산했을 때", "거꾸로 생각
     rule("① 잘못한 식 쓰기 → ② 거꾸로 어떤 수 구하기 → ③ 바르게 계산하기"),
     concept("분수도 똑같아요",
             f'<div class="ex">어떤 수에 {fr(2, 5)}를 곱해야 할 것을 잘못하여 <b>뺐더니</b> {fr(28, 55)}이 되었어요.</div>'
-            f'<div class="steps"><div>① 어떤 수 − {fr(2, 5)} {EQ} {fr(28, 55)}</div>'
+            f'<div class="steps roomy"><div>① 어떤 수 − {fr(2, 5)} {EQ} {fr(28, 55)}</div>'
             f'<div>② 어떤 수 {EQ} {fr(28, 55)} + {fr(2, 5)} {EQ} {fr(28, 55)} + {fr(22, 55)} {EQ} {fr(50, 55)} {EQ} <b>{fr(10, 11)}</b>　(통분: 분모를 55로)</div>'
             f'<div>③ {fr(10, 11)} {X} {fr(2, 5)} {EQ} <b>{fr(4, 11)}</b></div></div>'),
     words([
@@ -366,7 +366,7 @@ L.append(lesson("10", "어떤 수를 잘못 계산했을 때", "거꾸로 생각
         (f"어떤 수에 {fr(3, 4)}을 곱해야 할 것을 잘못하여 뺐더니 {fr(1, 8)}이 되었어요. 바르게 계산하면?", ""),
         (f"어떤 수에서 {fr(1, 3)}을 빼고 6을 곱해야 할 것을 잘못하여 {fr(1, 3)}을 빼고 6을 더했더니 {mx(6, 2, 5)}가 되었어요. 바르게 계산하면?<br>"
          f'<span class="hint">힌트: (어떤 수 − {fr(1, 3)})를 한 덩어리로 생각해요.</span>', ""),
-    ], space=14),
+    ], space=11),
 ])))
 ANS.append(("10", ["(1) 어떤 수 = 5/6 − 1/2 = 1/3 → 1/3 × 1/2 = 1/6", "(2) 어떤 수 = 1/8 + 3/4 = 7/8 → 7/8 × 3/4 = 21/32",
                    "(3) 덩어리 = 6과 2/5 − 6 = 2/5 → 2/5 × 6 = 12/5 = 2와 2/5"]))
@@ -454,6 +454,8 @@ table.toc td.c { width: 22mm; }
 .row > div:first-child { flex: none; }
 .ex { margin-top: 2mm; line-height: 2; }
 .steps > div { line-height: 2.1; }
+/* 분수가 연달아 나오는 풀이 줄: 위아래 분수가 붙지 않게 */
+.roomy > div { padding: 0.3em 0; }
 .rule { background: #d6ebe0; border-left: 4px solid #1d6b4f; border-radius: 2mm; padding: 2.5mm 4mm; margin-bottom: 3.5mm; line-height: 2; }
 .rt { display: inline-block; background: #1d6b4f; color: #fff; font-size: 9.5pt; font-weight: bold; border-radius: 1mm; padding: 0 2mm; margin-right: 3mm; }
 .careful { background: #fff7e0; border-left: 3px solid #e0a800; padding: 2mm 4mm; margin-bottom: 3.5mm; line-height: 1.9; }
@@ -475,10 +477,12 @@ table.toc td.c { width: 22mm; }
 .figq { display: inline-block; width: 49%; vertical-align: top; margin-bottom: 2mm; }
 .answers { break-before: page; }
 .answers h2 { font-size: 17pt; border-bottom: 2.5px solid #1d6b4f; padding-bottom: 3mm; margin: 0 0 4mm; }
-.ag { break-inside: avoid; margin-bottom: 6mm; }
+.ag { break-inside: avoid; margin-bottom: 5mm; }
 .ag .h { font-weight: bold; color: #1d6b4f; }
-.ag .items { display: grid; grid-template-columns: 1fr 1fr; column-gap: 8mm; line-height: 2.7; font-size: 11pt; padding-left: 4mm; }
+.ag .items { display: grid; grid-template-columns: 1fr 1fr; column-gap: 8mm; line-height: 2.3; font-size: 11pt; padding-left: 4mm; }
 .ag .items .w { grid-column: 1 / -1; }
+/* 분수가 든 줄은 정수 줄보다 키가 커서, 줄 사이 여백이 같아 보이도록 위아래를 더 띄움 */
+.ag .items > div:has(.fr) { padding: 0.3em 0; }
 """
 
 
