@@ -149,6 +149,85 @@ def total_text(t):
     return f
 
 
+def mixed_bars(n, d, stage, w=130, h=26):
+    """대분수 1과 n/d: 위는 1(통째 → d조각), 아래는 d조각 중 n조각. stage 3이면 조각에 번호."""
+    cw = w / d
+    s = [f'<svg viewBox="0 0 {w + 20} {2 * h + 26}" width="{w + 20}" height="{2 * h + 26}">', HATCH]
+    y1, y2 = 6, h + 18
+    fill = BLUE if stage == 3 else "url(#wbh)"  # 번호를 읽기 쉽게 3단계는 빗금 없이
+    if stage == 1:
+        s.append(f'<rect x="10" y="{y1}" width="{w}" height="{h}" fill="url(#wbh)" stroke="#000" stroke-width="1.2"/>')
+    else:
+        for i in range(d):
+            s.append(f'<rect x="{10 + i * cw}" y="{y1}" width="{cw}" height="{h}" fill="{fill}" stroke="#000" stroke-width="1.2"/>')
+    for i in range(d):
+        s.append(f'<rect x="{10 + i * cw}" y="{y2}" width="{cw}" height="{h}" fill="{fill if i < n else "#fff"}" stroke="#000" stroke-width="1.2"/>')
+    if stage == 3:
+        for k in range(d + n):
+            x = 10 + (k % d + 0.5) * cw
+            y = (y1 if k < d else y2) + h / 2 + 5
+            s.append(f'<text x="{x}" y="{y}" font-size="12" font-weight="bold" text-anchor="middle">{k + 1}</text>')
+    s.append("</svg>")
+    return "".join(s)
+
+
+def flow(a, op, b, back=False, w=170):
+    """[a] → op → [b]. back이면 화살표가 b에서 a로."""
+    bw, bh, y = 40, 32, 22
+    xa, xb = 8, w - 8 - bw
+    s = [f'<svg viewBox="0 0 {w} 64" width="{w}" height="64">']
+    for x, t in ((xa, a), (xb, b)):
+        s.append(f'<rect x="{x}" y="{y}" width="{bw}" height="{bh}" fill="#fff" stroke="#000" stroke-width="1.4"/>')
+        s.append(f'<text x="{x + bw / 2}" y="{y + bh / 2 + 6}" font-size="17" text-anchor="middle">{t}</text>')
+    x0, x1 = xa + bw + 6, xb - 6
+    if back:
+        x0, x1 = x1, x0
+    tip = -1 if back else 1
+    ym = y + bh / 2
+    s.append(f'<line x1="{x0}" y1="{ym}" x2="{x1}" y2="{ym}" stroke="#000" stroke-width="1.4"/>')
+    s.append(f'<path d="M{x1 - 8 * tip},{ym - 5} L{x1},{ym} L{x1 - 8 * tip},{ym + 5}" fill="none" stroke="#000" stroke-width="1.4"/>')
+    s.append(f'<text x="{(x0 + x1) / 2}" y="{ym - 8}" font-size="14" text-anchor="middle" font-weight="bold">{op}</text>')
+    s.append("</svg>")
+    return "".join(s)
+
+
+def nl_points(top, d, target, cands=(), bad=(), w=200):
+    """0~top 수직선(1/d 작은 눈금). target=(자연수, 분자)에 ▼, cands/bad = [(자연수, 분자)] 점(파랑/빨강), 점 아래 □ 값."""
+    x0, x1, y = 14, w - 14, 34
+    unit = (x1 - x0) / top
+    s = [f'<svg viewBox="0 0 {w} 70" width="{w}" height="70">']
+    s.append(f'<line x1="{x0}" y1="{y}" x2="{x1}" y2="{y}" stroke="#000" stroke-width="1.4"/>')
+    for k in range(top * d + 1):
+        x = x0 + k * unit / d
+        big = k % d == 0
+        s.append(f'<line x1="{x}" y1="{y - (7 if big else 4)}" x2="{x}" y2="{y + (7 if big else 4)}" stroke="#000" stroke-width="{1.4 if big else 0.8}"/>')
+        if big:
+            s.append(f'<text x="{x}" y="{y + 22}" font-size="12" text-anchor="middle">{k // d}</text>')
+    tx = x0 + (target[0] + target[1] / d) * unit
+    s.append(f'<path d="M{tx - 6},{y - 20} L{tx + 6},{y - 20} L{tx},{y - 10} Z" fill="#000"/>')
+    for pts, col in ((cands, BLUE_D), (bad, "#c0392b")):
+        for a, b in pts:
+            x = x0 + (a + b / d) * unit
+            s.append(f'<circle cx="{x}" cy="{y}" r="4.5" fill="{col}"/>')
+            s.append(f'<text x="{x}" y="{y + 34}" font-size="11" fill="{col}" text-anchor="middle" font-weight="bold">□={a}</text>')
+    s.append("</svg>")
+    return "".join(s)
+
+
+def stages(*items):
+    """단계 그림을 한 줄로: (그림, 설명) 여러 개."""
+    return '<div class="stages">' + "".join(f'<div>{fig}<p>{cap}</p></div>' for fig, cap in items) + '</div>'
+
+
+def story(t):
+    return f'<div class="ex" style="margin-top:0">{t}</div>'
+
+
+def CX(a, b):
+    """약분 표시: a에 빗금, 위에 b."""
+    return f'<span class="cx"><s>{a}</s><i>{b}</i></span>'
+
+
 # ---------- 블록 ----------
 def concept(title, body):
     return f'<div class="concept blk"><div class="ct">{title}</div>{body}</div>'
@@ -200,12 +279,14 @@ ANS = []
 
 # 1
 L.append(lesson("1", "'~의 ~'는 곱셈이에요", "분수만큼 구하기", "10", "".join([
-    concept("사탕 12개의 " + fr(1, 3) + "은 몇 개일까요?",
-            f'<div class="row"><div>{bar(12, 4, "사탕 12개", cell_labels=None, note=["●"] * 12)}</div>'
-            f'<div class="side">12개를 3묶음으로 똑같이 나누면 한 묶음은 4개예요.<br>'
-            f'그중 1묶음이니까 4개예요.<br>12의 {fr(1, 3)} {EQ} 12 {X} {fr(1, 3)} {EQ} <b>4</b></div></div>'
-            f'<div class="row"><div>{bar(12, 8, "사탕 12개", note=["●"] * 12)}</div>'
-            f'<div class="side">12의 {fr(2, 3)}은 2묶음이에요.<br>4 + 4 {EQ} 8개<br>12 {X} {fr(2, 3)} {EQ} <b>8</b></div></div>'),
+    concept(f"12의 {fr(1, 3)}은 12를 3묶음으로 나눈 것 중 1묶음이에요",
+            story("사탕 12개를 3묶음으로 똑같이 나누어 1묶음을 먹었어요. 먹은 사탕은 몇 개일까요?")
+            + stages((bar(12, 0, "사탕 12개", w=140, h=24, note=["●"] * 12), "① 사탕 12개"),
+                     (bar(3, 0, "12 ÷ 3 = 4", w=140, h=24, note=["●●●●"] * 3), "② 3묶음으로 똑같이<br>나누면 한 묶음 4개"),
+                     (bar(3, 1, "4개", w=140, h=24, note=["●●●●"] * 3), f"③ 그중 1묶음<br>→ {fr(1, 3)}은 4개"),
+                     (bar(3, 2, "4 + 4 = 8개", w=140, h=24, note=["●●●●"] * 3), f"④ 2묶음이면<br>→ {fr(2, 3)}은 8개"))
+            + f'<div class="ex">12의 {fr(1, 3)} {EQ} 12 {X} {fr(1, 3)} {EQ} <b>4</b>　　12의 {fr(2, 3)} {EQ} 12 {X} {fr(2, 3)} {EQ} <b>8</b><br>'
+              "→ 분모만큼 묶음으로 나누고, 분자만큼 가져와요. '~의'는 '×'로 바꿔 써요.</div>"),
     rule(f"<b>■의 {fr('▲', '●')}</b> {EQ} ■ {X} {fr('▲', '●')}　→　■를 ●묶음으로 나누고(÷●), 그중 ▲묶음(×▲)"),
     follow(f'<div class="row"><div>{bar(10, 9, "30 cm")}</div><div class="side">'
            f'30cm의 {fr(9, 10)}<br>① 10묶음으로 나누면 한 묶음: 30 ÷ 10 {EQ} {BL}<br>'
@@ -219,11 +300,15 @@ ANS.append(("1", ["따라 해 봐요: 3, 3 × 9 = 27", "(1) 5", "(2) 15", "(3) 1
 
 # 2
 L.append(lesson("2", "단위를 바꾸면 쉬워요", "작은 단위로 바꾸어 계산하기", "05, 06", "".join([
-    concept("먼저 작은 단위로 바꿔요",
-            '<table class="units"><tr><td>1m = <b>100</b>cm</td><td>1km = <b>1000</b>m</td><td>1kg = <b>1000</b>g</td></tr>'
-            '<tr><td>1L = <b>1000</b>mL</td><td>1시간 = <b>60</b>분</td><td>1일 = <b>24</b>시간</td></tr></table>'
-            f'<div class="ex">1m의 {fr(1, 5)} → 100cm의 {fr(1, 5)} → 100 {X} {fr(1, 5)} {EQ} <b>20cm</b></div>'),
-    careful(f"1시간은 100분이 아니라 <b>60분</b>이에요. 1시간의 {fr(1, 2)}은 30분이에요."),
+    concept(f"1m의 {fr(1, 5)}은 100cm의 {fr(1, 5)}이에요",
+            story("끈 1m를 5도막으로 똑같이 잘랐어요. 한 도막은 몇 cm일까요?")
+            + stages((bar(1, 0, w=140, h=24, note=["1m"]), "① 끈 1m"),
+                     (bar(1, 0, w=140, h=24, note=["100cm"]), "② 1m를 100cm로 바꿔요"),
+                     (bar(5, 1, w=140, h=24, note=["20"] * 5), "③ 5도막 → 한 도막 20cm"))
+            + f'<div class="ex">1m의 {fr(1, 5)} → 100cm의 {fr(1, 5)} → 100 {X} {fr(1, 5)} {EQ} <b>20cm</b><br>'
+              "→ 작은 단위로 바꾸면 1차시처럼 자연수의 분수만큼 구하기가 돼요.</div>"
+            + '<table class="units"><tr><td>1m = <b>100</b>cm</td><td>1km = <b>1000</b>m</td><td>1kg = <b>1000</b>g</td></tr>'
+              '<tr><td>1L = <b>1000</b>mL</td><td>1시간 = <b>60</b>분</td><td>1일 = <b>24</b>시간</td></tr></table>'),
     follow(f'1kg의 {fr(1, 4)} → {BL}g의 {fr(1, 4)} → {BL} {X} {fr(1, 4)} {EQ} {BL}g<br>'
            f'1시간의 {fr(1, 3)} → {BL}분의 {fr(1, 3)} → {BL} {X} {fr(1, 3)} {EQ} {BL}분'),
     drills([f"1m의 {fr(3, 4)} {EQ} {BL}cm", f"1km의 {fr(1, 2)} {EQ} {BL}m", f"1L의 {fr(3, 10)} {EQ} {BL}mL",
@@ -234,18 +319,20 @@ L.append(lesson("2", "단위를 바꾸면 쉬워요", "작은 단위로 바꾸�
     words([
         (f"1시간의 {fr(1, 4)} 동안 책을 읽었어요. 책을 읽은 시간은 몇 분일까요?", "분"),
         (f"물 1L의 {fr(3, 5)}를 마셨어요. 마신 물은 몇 mL일까요?", "mL"),
-    ], start=11, title=None, space=12),
+    ], start=11, title=None, space=9),
 ])))
 ANS.append(("2", ["따라 해 봐요: 1000, 1000 × 1/4 = 250g / 60, 60 × 1/3 = 20분", "(1) 75", "(2) 500", "(3) 300",
                   "(4) 400", "(5) 15", "(6) 50", "(7) × (20cm)", "(8) ○", "(9) × (30분)", "(10) × (500m)", "(11) 60 × 1/4 = 15분", "(12) 1000 × 3/5 = 600mL"]))
 
 # 3
 L.append(lesson("3", "'분'을 '시간'으로 바꿔요", "분을 분모가 60인 분수로 나타내기", "08", "".join([
-    concept("1시간(60분)을 막대로 그려 봐요",
-            f'<div class="row"><div>{bar(6, 1, "1시간 = 60분", cell_labels=["10분"] * 6)}</div>'
-            f'<div class="side">60분을 10분씩 나누면 6칸이에요.<br>10분은 6칸 중 1칸 → <b>{fr(1, 6)}시간</b><br>'
-            f'식으로: 10분 {EQ} {fr(10, 60)}시간 {EQ} {fr(1, 6)}시간</div></div>'
-            f'<div class="ex">2시간 10분 {EQ} 2시간 + {fr(1, 6)}시간 {EQ} <b>{mx(2, 1, 6)}시간</b></div>'),
+    concept("10분은 1시간을 6칸으로 나눈 것 중 1칸이에요",
+            story("10분은 몇 시간일까요? 1시간을 막대로 그려 봐요.")
+            + stages((bar(1, 0, w=170, h=24, note=["60분"]), "① 1시간 = 60분"),
+                     (bar(6, 0, w=170, h=24, note=["10"] * 6), "② 10분씩 나누면 6칸"),
+                     (bar(6, 1, w=170, h=24, note=["10"] * 6), f"③ 10분은 6칸 중 1칸 → {fr(1, 6)}시간"))
+            + f'<div class="ex">식으로: 10분 {EQ} {fr(10, 60)}시간 {EQ} {fr(1, 6)}시간　(1시간은 60분이라 분모가 60)<br>'
+              f'2시간 10분 {EQ} 2시간 + {fr(1, 6)}시간 {EQ} <b>{mx(2, 1, 6)}시간</b></div>'),
     rule(f"<b>■분 {EQ} {fr('■', 60)}시간</b>　(분모는 항상 60, 그다음 약분해요)"),
     careful(f"10분을 {fr(10, 100)}시간으로 쓰면 틀려요. 1시간은 <b>60분</b>이에요."),
     follow(f"20분 {EQ} {bfr(20, None)}시간 {EQ} {bfr()}시간<br>1시간 30분 {EQ} 1시간 + {bfr(30, None)}시간 {EQ} 1{bfr()}시간"),
@@ -262,10 +349,12 @@ ANS.append(("3", ["따라 해 봐요: 20/60 = 1/3시간 / 30/60 → 1과 1/2시�
 
 # 4
 L.append(lesson("4", "(자연수) × (분수)는 약분 먼저", "곱하기 전에 약분하기", "01, 13, 14", "".join([
-    concept(f"28 {X} {fr(11, 7)}을 계산해 봐요",
-            f'<div class="steps"><div>① 28과 분모 7을 7로 약분해요. 28 → 4, 7 → 1</div>'
-            f'<div>② 4 {X} {fr(11, 1)} {EQ} 4 {X} 11 {EQ} <b>44</b></div></div>'
-            f'<div class="ex">약분을 먼저 하면 28 {X} 11 {EQ} 308 같은 큰 계산을 안 해도 돼요.</div>'),
+    concept(f"28 {X} {fr(11, 7)}은 28을 7로 먼저 나누면 쉬워요",
+            story(f"28 {X} {fr(11, 7)}은 '28을 7묶음으로 나눈 한 묶음이 11개'라는 뜻이에요.")
+            + stages((bar(7, 1, "28", w=150, h=24, note=["4"] * 7), "① 28을 7묶음으로 나누면<br>한 묶음 28 ÷ 7 = 4"),
+                     (bar(11, 11, w=170, h=24, note=["4"] * 11), "② 한 묶음 4가 11개<br>4 × 11 = 44"),
+                     (f'<div class="cancel">{CX("28", "4")} {X} {fr("11", CX("7", "1"))}</div>', "③ 식에서는 28과 7을<br>7로 나눠요 (약분)"))
+            + f'<div class="ex">약분 먼저: 4 {X} 11 {EQ} <b>44</b> (쉬워요)　　그냥 곱하면: 28 {X} 11 {EQ} 308, 308 ÷ 7 {EQ} 44 (어려워요)</div>'),
     rule("자연수와 분모를 같은 수로 나눌 수 있으면 먼저 약분하고, 남은 수끼리 곱해요."),
     follow(f"24 {X} {fr(5, 6)} → 24와 6을 {BL}로 약분 → {BL} {X} 5 {EQ} {BL}"),
     drills([f"14 {X} {fr(3, 7)} {EQ} {BL}", f"24 {X} {fr(5, 6)} {EQ} {BL}", f"36 {X} {fr(7, 9)} {EQ} {BL}",
@@ -279,10 +368,13 @@ ANS.append(("4", ["따라 해 봐요: 6으로 약분 → 4 × 5 = 20", "(1) 6", 
 
 # 5
 L.append(lesson("5", "대분수는 가분수로 바꿔서 곱해요", "대분수를 가분수로 고쳐 곱하기", "01, 08, 19", "".join([
-    concept(f"{mx(1, 4, 7)}을 그림으로 봐요",
-            f'<div class="row"><div>{bar(7, 7, "1 (7조각)", w=200)}{bar(7, 4, f"4조각", w=200)}</div>'
-            f'<div class="side">1은 7조각, 거기에 4조각을 더하면<br>모두 7 + 4 = <b>11조각</b><br>'
-            f'→ {mx(1, 4, 7)} {EQ} <b>{fr(11, 7)}</b></div></div>'),
+    concept(f"{mx(1, 4, 7)}은 {fr(1, 7)}이 몇 조각인지 세어 봐요",
+            story(f"피자 {mx(1, 4, 7)}판이 있어요. 한 조각이 {fr(1, 7)}판이 되게 자르면 모두 몇 조각일까요?")
+            + stages((mixed_bars(4, 7, 1), f"① 1판과 {fr(4, 7)}판"),
+                     (mixed_bars(4, 7, 2), "② 1판을 7조각으로<br>잘라요"),
+                     (mixed_bars(4, 7, 3), "③ 모두 세면<br>7 + 4 = 11조각"))
+            + f'<div class="ex">{mx(1, 4, 7)} {EQ} <b>{fr(11, 7)}</b>　분모 7은 그대로, 분자는 7 {X} 1 + 4 {EQ} 11<br>'
+              "→ 대분수를 가분수로 바꾸면 분자끼리, 분모끼리 곱할 수 있어요.</div>"),
     rule(f"{mx('●', '▲', '■')} {EQ} {fr('■ × ● + ▲', '■')}　　예) {mx(2, 2, 7)} {EQ} {fr('7 × 2 + 2', 7)} {EQ} {fr(16, 7)}"),
     follow(f"28 {X} {mx(1, 4, 7)} {EQ} 28 {X} {bfr(None, 7)} {EQ} {BL}<br>"
            f"{mx(2, 5, 9)} {X} {mx(1, 4, 5)} {EQ} {bfr(None, 9)} {X} {bfr(None, 5)} {EQ} {bfr()} {EQ} {BL}{bfr()}"),
@@ -321,10 +413,11 @@ ANS.append(("6", ["따라 해 봐요: 2로 약분 → 10/27", "(1) 1/8", "(2) 2/
 
 # 7
 L.append(lesson("7", "똑같이 나눈 선분과 수직선", "한 칸의 크기 구하기", "09, 10, 11, 12", "".join([
-    concept("전체를 ●칸으로 똑같이 나누면 한 칸은 전체의 " + fr(1, "●"),
-            f'<div class="row"><div>{segment(6, total_mixed(4, 2, 3, "m"), {0: "ㄱ", 1: "ㄴ", 2: "ㄷ", 3: "ㄹ", 6: "ㅁ"})}</div>'
-            f'<div class="side">전체 {mx(4, 2, 3)}m를 6칸으로 나눴어요.<br>ㄱㄴ은 1칸 → 전체의 {fr(1, 6)}<br>'
-            f'{fr(14, 3)} {X} {fr(1, 6)} {EQ} {fr(14, 18)} {EQ} <b>{fr(7, 9)}m</b></div></div>'),
+    concept("한 칸은 전체를 칸 수로 똑같이 나눈 것이에요",
+            story(f"끈 {mx(4, 2, 3)}m를 6도막으로 똑같이 잘랐어요. 한 도막은 몇 m일까요?")
+            + stages((segment(6, total_mixed(4, 2, 3, "m"), {}, w=300), "① 6칸으로 똑같이 나눠요 (눈금 7개, 칸 6개)"),
+                     (segment(6, total_mixed(4, 2, 3, "m"), {0: "ㄱ", 1: "ㄴ"}, w=300), f"② ㄱㄴ은 1칸 → 전체의 {fr(1, 6)}"))
+            + f'<div class="ex">{mx(4, 2, 3)} {X} {fr(1, 6)} {EQ} {fr(14, 3)} {X} {fr(1, 6)} {EQ} {fr(14, 18)} {EQ} <b>{fr(7, 9)}m</b></div>'),
     rule(f"<b>▲칸의 크기 {EQ} 전체 {X} {fr('▲', '●')}</b>　(칸은 눈금과 눈금 사이, 0부터 세요)"),
     follow(f'<div class="row"><div>{nl(8, (4, 15), box_at=3)}</div><div class="side">'
            f'0부터 {fr(4, 15)}까지 8칸<br>한 칸: {fr(4, 15)} {X} {fr(1, 8)} {EQ} {bfr()}<br>'
@@ -339,11 +432,12 @@ ANS.append(("7", ["따라 해 봐요: 1/30, 1/30 × 3 = 3/30 = 1/10", "(1) 3/4",
 
 # 8
 L.append(lesson("8", "'나머지의 ~'는 차례차례", "먼저 나머지를 구해요", "13, 14", "".join([
-    concept("40km 중 " + fr(3, 8) + "은 전철, 나머지의 " + fr(3, 5) + "은 버스, 그 나머지는 걸었어요",
-            f'<div class="row"><div>{bar(8, 3, "40 km", note=["전철"] * 3 + [""] * 5)}</div>'
-            f'<div class="side">① 전철: 40 {X} {fr(3, 8)} {EQ} 15km<br>② 나머지: 40 − 15 {EQ} <b>25km</b></div></div>'
-            f'<div class="row"><div>{bar(5, 3, "나머지 25 km", note=["버스"] * 3 + ["걸음"] * 2)}</div>'
-            f'<div class="side">③ 버스: 25 {X} {fr(3, 5)} {EQ} 15km<br>④ 걸어간 거리: 25 − 15 {EQ} <b>10km</b></div></div>'),
+    concept(f"'나머지의 {fr(3, 5)}'은 나머지를 새 전체로 봐요",
+            story(f"40km 중 {fr(3, 8)}은 전철, 나머지의 {fr(3, 5)}은 버스, 그 나머지는 걸었어요. 걸은 거리는?")
+            + stages((bar(8, 3, "40 km", w=140, h=24), f"① 전철: 40 {X} {fr(3, 8)}<br>{EQ} 15km"),
+                     (bar(5, 0, "나머지 25 km", w=140, h=24), "② 나머지:<br>40 − 15 = 25km"),
+                     (bar(5, 3, "25 km", w=140, h=24), f"③ 버스: 25 {X} {fr(3, 5)}<br>{EQ} 15km"),
+                     (bar(5, 3, "25 km", w=140, h=24, shade2=2), "④ 걸은 거리:<br>25 − 15 = <b>10km</b>"))),
     careful(f"버스는 40km의 {fr(3, 5)}이 아니라 <b>나머지 25km</b>의 {fr(3, 5)}이에요."),
     follow(f"철사 90cm 중 {fr(2, 5)}를 쓰고, 나머지의 {fr(2, 3)}를 친구에게 줬어요. 남은 철사는?<br>"
            f"① 쓴 철사: 90 {X} {fr(2, 5)} {EQ} {BL}　② 나머지: 90 − {BL} {EQ} {BL}<br>"
@@ -359,29 +453,31 @@ ANS.append(("8", ["따라 해 봐요: 36, 36, 54, 54 × 2/3 = 36, 54 − 36 = 18
 
 # 9
 L.append(lesson("9", "남은 양으로 처음 양 구하기", "남은 부분이 전체의 얼마인지부터 구하기", "17, 18", "".join([
-    concept(f"빵의 {fr(3, 4)}을 팔고 15개가 남았어요. 처음 빵은?",
-            f'<div class="row"><div>{bar(4, 0, "처음 빵 ?개", shade2=3, note=["판 빵"] * 3 + ["15개"])}</div>'
-            f'<div class="side">① 남은 빵은 1 − {fr(3, 4)} {EQ} <b>{fr(1, 4)}</b><br>'
-            f'② 4칸 중 1칸이 15개<br>③ 4칸은 15 {X} 4 {EQ} <b>60개</b></div></div>'),
-    careful("15개는 판 빵이 아니라 <b>남은 빵</b>이에요."),
+    concept("남은 양이 전체의 얼마인지 먼저 찾아요",
+            story(f"빵의 {fr(3, 4)}을 팔고 15개가 남았어요. 처음 빵은 몇 개일까요?")
+            + stages((bar(4, 3, w=150, h=24), f"① 판 빵 {fr(3, 4)}<br>(4칸 중 3칸)"),
+                     (bar(4, 3, w=150, h=24, shade2=1, note=["", "", "", "15"]), f"② <b>남은</b> 빵 {fr(1, 4)}<br>1칸이 15개"),
+                     (bar(4, 0, w=150, h=24, note=["15"] * 4), "③ 4칸이면<br>15 × 4 = <b>60개</b>"))
+            + f'<div class="ex">→ 15개는 판 빵이 아니라 <b>남은 빵</b>이에요. 남은 칸을 먼저 찾아요.</div>'),
     follow(f"색종이 60장을 학생들이 한 장씩 가졌더니 전체의 {fr(1, 5)}이 남았어요. 학생은 몇 명?<br>"
            f"① 남은 색종이: 60 {X} {fr(1, 5)} {EQ} {BL}장<br>② 가져간 색종이: 60 − {BL} {EQ} {BL}장<br>③ 학생 수: {BL}명"),
     words([
         (f"사탕의 {fr(2, 3)}를 먹었더니 10개가 남았어요. 처음 사탕은 몇 개?", "개"),
         (f"스티커의 {fr(3, 5)}를 썼더니 8장이 남았어요. 처음 스티커는 몇 장?", "장"),
         (f"구슬 40개를 친구들에게 한 개씩 나누어 주었더니 전체의 {fr(1, 4)}이 남았어요. 친구는 몇 명?", "명"),
-    ], space=20),
+    ], space=16),
 ])))
 ANS.append(("9", ["따라 해 봐요: 12, 12, 48, 48명", "(1) 남은 1/3이 10개 → 30개", "(2) 남은 2/5가 8장 → 1/5은 4장 → 20장",
                   "(3) 남은 구슬 10개, 나눠 준 30개 → 30명"]))
 
 # 10
 L.append(lesson("10", "어떤 수를 잘못 계산했을 때", "잘못한 식에서 어떤 수 찾기", "15, 16", "".join([
-    concept("먼저 쉬운 수로 연습해요",
-            f'<div class="ex">어떤 수에 3을 <b>곱해야</b> 할 것을 잘못하여 <b>더했더니</b> 10이 되었어요.</div>'
-            f'<div class="steps"><div>① 잘못한 식: 어떤 수 + 3 {EQ} 10</div>'
-            f'<div>② 거꾸로: 어떤 수 {EQ} 10 − 3 {EQ} <b>7</b>　(더했으면 빼고, 뺐으면 더해요)</div>'
-            f'<div>③ 바른 계산: 7 {X} 3 {EQ} <b>21</b></div></div>'),
+    concept("잘못한 길을 거꾸로 되돌아가요",
+            story("어떤 수에 3을 <b>곱해야</b> 할 것을 잘못하여 <b>더했더니</b> 10이 되었어요.")
+            + stages((flow("?", "+ 3", "10"), "① 잘못한 식<br>어떤 수 + 3 = 10"),
+                     (flow("7", "− 3", "10", back=True), "② 거꾸로 가요<br>10 − 3 = 7"),
+                     (flow("7", "× 3", "21"), "③ 바르게 계산<br>7 × 3 = <b>21</b>"))
+            + '<div class="ex">→ 더했으면 빼고, 뺐으면 더해서 어떤 수로 되돌아가요.</div>'),
     rule("① 잘못한 식 쓰기 → ② 거꾸로 어떤 수 구하기 → ③ 바르게 계산하기"),
     concept("분수도 똑같아요",
             f'<div class="ex">어떤 수에 {fr(2, 5)}를 곱해야 할 것을 잘못하여 <b>뺐더니</b> {fr(28, 55)}이 되었어요.</div>'
@@ -400,11 +496,12 @@ ANS.append(("10", ["(1) 어떤 수 = 5/6 − 1/2 = 1/3 → 1/3 × 1/2 = 1/6", "(
 
 # 11
 L.append(lesson("11", "□ 안에 들어갈 자연수", "대분수 크기 비교", "19", "".join([
-    concept("대분수는 자연수 부분부터 비교해요",
-            f'<div class="steps"><div>① 자연수 부분이 크면 더 커요. {mx(4, 1, 5)} {LT} {mx(5, 1, 5)}</div>'
-            f'<div>② 자연수 부분이 같으면 분수 부분을 비교해요. {mx(4, 2, 5)} {LT} {mx(4, 3, 5)}</div></div>'
-            f'<div class="ex"><span class="mx">{BOX}{fr(1, 3)}</span>{LT}{mx(3, 2, 3)} → □에 1, 2를 넣으면 당연히 작아요.<br>'
-            f'□ {EQ} 3이면 {mx(3, 1, 3)}와 {mx(3, 2, 3)}: 분수 부분 {fr(1, 3)} {LT} {fr(2, 3)}이니까 돼요. → 1, 2, 3 → <b>3개</b></div>'),
+    concept("대분수는 수직선에 놓으면 크기가 보여요",
+            story(f'<span class="mx">{BOX}{fr(1, 3)}</span>{LT}{mx(3, 2, 3)}　□ 안에 들어갈 자연수를 찾아요.')
+            + stages((nl_points(5, 3, (3, 2)), f"① {mx(3, 2, 3)}에 ▼ 표시"),
+                     (nl_points(5, 3, (3, 2), cands=[(1, 1), (2, 1), (3, 1)]), f"② □{fr(1, 3)}에 1, 2, 3을 넣으면<br>모두 ▼보다 왼쪽 → 작아요"),
+                     (nl_points(5, 3, (3, 2), cands=[(1, 1), (2, 1), (3, 1)], bad=[(4, 1)]), "③ 4를 넣으면 오른쪽<br>→ 커서 안 돼요"))
+            + f'<div class="ex">자연수 부분이 크면 더 커요. 같으면(□ {EQ} 3) 분수 부분 {fr(1, 3)} {LT} {fr(2, 3)}을 비교해요. → 1, 2, 3 → <b>3개</b></div>'),
     careful("□가 오른쪽 자연수와 <b>같을 때</b>를 꼭 확인해요. 가장 많이 빠뜨려요."),
     follow(f"<span class=\"mx\">{BOX}{fr(2, 5)}</span>{LT}{mx(2, 5, 9)} {X} {mx(1, 4, 5)}<br>"
            f"① 오른쪽 계산: {fr(23, 9)} {X} {fr(9, 5)} {EQ} {bfr()} {EQ} {BL}{bfr()}<br>"
@@ -488,6 +585,9 @@ table.toc td.c { width: 22mm; }
 .roomy > div { padding: 0.3em 0; }
 .stages { display: flex; justify-content: space-between; margin: 1mm 0; }
 .stages > div { text-align: center; }
+.cancel { font-size: 15pt; padding: 8mm 4mm 2mm; }
+.cx { position: relative; display: inline-block; }
+.cx i { position: absolute; top: -0.85em; right: -0.5em; font-size: 0.7em; font-style: normal; color: #c0392b; font-weight: bold; }
 .stages p { margin: 0; font-size: 9.5pt; line-height: 1.5; }
 .rule { background: #d6ebe0; border: 1px solid #9cc5b0; padding: 2.5mm 4mm; margin-bottom: 3.5mm; line-height: 2; }
 .rt { display: inline-block; background: #1d6b4f; color: #fff; font-size: 9.5pt; font-weight: bold; padding: 0 2mm; margin-right: 3mm; }
