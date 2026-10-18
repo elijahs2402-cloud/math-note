@@ -319,7 +319,7 @@ L.append(lesson("2", "단위를 바꾸면 쉬워요", "작은 단위로 바꾸�
     words([
         (f"1시간의 {fr(1, 4)} 동안 책을 읽었어요. 책을 읽은 시간은 몇 분일까요?", "분"),
         (f"물 1L의 {fr(3, 5)}를 마셨어요. 마신 물은 몇 mL일까요?", "mL"),
-    ], start=11, title=None, space=9),
+    ], start=11, title=None, space=12),
 ])))
 ANS.append(("2", ["따라 해 봐요: 1000, 1000 × 1/4 = 250g / 60, 60 × 1/3 = 20분", "(1) 75", "(2) 500", "(3) 300",
                   "(4) 400", "(5) 15", "(6) 50", "(7) × (20cm)", "(8) ○", "(9) × (30분)", "(10) × (500m)", "(11) 60 × 1/4 = 15분", "(12) 1000 × 3/5 = 600mL"]))
@@ -406,7 +406,7 @@ L.append(lesson("6", "(분수) × (분수)를 그림으로", "분자는 분자�
             f"{fr(3, 4)} {X} {fr(2, 3)} {EQ} {bfr()}", f"{fr(5, 6)} {X} {fr(3, 10)} {EQ} {bfr()}",
             f"{fr(10, 11)} {X} {fr(2, 5)} {EQ} {bfr()}", f"{fr(4, 15)} {X} {fr(3, 8)} {EQ} {bfr()}"]),
     words([(f"케이크 {fr(4, 9)}kg의 {fr(5, 6)}을 세 사람이 똑같이 나누어 먹었어요. ① 세 사람이 먹은 양은? ② 한 사람이 먹은 양은?", "kg")],
-          start=7, title=None, space=12),
+          start=7, title=None, space=16),
 ])))
 ANS.append(("6", ["따라 해 봐요: 2로 약분 → 10/27", "(1) 1/8", "(2) 2/15", "(3) 1/2", "(4) 1/4", "(5) 4/11",
                   "(6) 1/10", "(7) ① 10/27kg ② 10/27 × 1/3 = 10/81kg"]))
@@ -510,7 +510,7 @@ L.append(lesson("11", "□ 안에 들어갈 자연수", "대분수 크기 비교
         (f"<span class=\"mx\">{BOX}{fr(3, 4)}</span>{LT}{mx(2, 1, 4)}　□ 안에 들어갈 수 있는 자연수는 몇 개?", "개"),
         (f"<span class=\"mx\">{BOX}{fr(1, 5)}</span>{LT}{mx(3, 4, 5)}　□ 안에 들어갈 수 있는 자연수는 몇 개?", "개"),
         (f"<span class=\"mx\">{BOX}{fr(1, 2)}</span>{LT}{mx(1, 1, 2)} {X} 3　□ 안에 들어갈 수 있는 자연수는 몇 개?", "개"),
-    ], space=18),
+    ], space=14),
 ])))
 ANS.append(("11", ["따라 해 봐요: 23/5 = 4와 3/5, 된다, 4개", "(1) □=2이면 2와 3/4 > 2와 1/4 → 1만 → 1개",
                    "(2) 1, 2, 3 → 3개", "(3) 오른쪽 = 9/2 = 4와 1/2, □=4이면 같아서 안 됨 → 1, 2, 3 → 3개"]))
@@ -551,7 +551,7 @@ body { margin: 0; font-family: 'Noto Sans CJK KR', 'Noto Sans KR', 'Malgun Gothi
 .op.x { font-size: 0.85em; }
 .box { display: inline-block; width: 1.1em; height: 1.25em; border: 1.4px solid #000; vertical-align: middle; }
 .bl { display: inline-block; min-width: 2.4em; height: 1.45em; border: 1.3px solid #555; vertical-align: middle; margin: 0 0.15em; }
-.sb { display: inline-block; width: 1.5em; height: 1.2em; border: 1.1px solid #555; margin: 0.08em 0; }
+.sb { display: inline-block; width: 2.1em; height: 1.5em; border: 1.1px solid #555; margin: 0.06em 0; }
 .blk { break-inside: avoid; }
 .cover { text-align: left; }
 .cover .t1 { font-size: 12pt; color: #1d6b4f; font-weight: bold; }
@@ -599,6 +599,7 @@ table.toc td.c { width: 22mm; }
 .pt { font-weight: bold; color: #1d6b4f; font-size: 12pt; margin: 2mm 0 2mm; }
 .drills .grid { display: grid; grid-template-columns: 1fr 1fr; column-gap: 8mm; row-gap: 1mm; }
 .dr { line-height: 2.6; }
+.drills .dr:has(.fr) { line-height: 1.6; padding: 0.4em 0; }
 .qn { color: #1d6b4f; font-weight: bold; margin-right: 2mm; }
 .units { border-collapse: collapse; margin-bottom: 1mm; }
 .units td { border: 1px solid #aac; padding: 1mm 4mm; }
