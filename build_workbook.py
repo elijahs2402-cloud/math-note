@@ -52,18 +52,37 @@ def bar(parts, shade, total=None, shade2=0, cell_labels=None, w=330, h=34, note=
     return "".join(s)
 
 
-def area(a, b, c, d, size=150):
-    """(a/b) × (c/d) 넓이 모델: 가로를 b칸으로 나눠 a칸(연한 파랑), 세로를 d칸으로 나눠 그 안의 c칸(진한 파랑)."""
+def area(a, b, c, d, stage, size=84):
+    """(a/b) × (c/d) 넓이 모델을 한 단계씩.
+    1: 전체 1 / 2: 가로를 b칸으로 나눠 a칸 연하게 / 3: 연한 부분만 세로로 d칸 나눠 c칸 진하게 / 4: 선을 끝까지 그어 칸 세기."""
     cw, rh = size / b, size / d
-    ox, oy = 46, 34
-    s = [f'<svg viewBox="0 0 {size + 60} {size + 44}" width="{size + 60}" height="{size + 44}">']
-    for i in range(b):
-        for j in range(d):
-            fill = BLUE_D if (i < a and j < c) else BLUE if i < a else "#fff"
-            s.append(f'<rect x="{ox + i * cw}" y="{oy + j * rh}" width="{cw}" height="{rh}" fill="{fill}" stroke="#555" stroke-width="0.8"/>')
+    ox, oy = 30, 30
+    s = [f'<svg viewBox="0 0 {size + 40} {size + 36}" width="{size + 40}" height="{size + 36}">']
+    if stage == 1:
+        s.append(f'<text x="{ox + size / 2}" y="{oy + size / 2 + 8}" font-size="22" text-anchor="middle">1</text>')
+    if stage >= 2:
+        for i in range(a):
+            s.append(f'<rect x="{ox + i * cw}" y="{oy}" width="{cw}" height="{size}" fill="{BLUE}"/>')
+        for i in range(1, b):
+            s.append(f'<line x1="{ox + i * cw}" y1="{oy}" x2="{ox + i * cw}" y2="{oy + size}" stroke="#555" stroke-width="0.9"/>')
+        s.append(svg_frac(ox + a * cw / 2, 12, a, b, size=11))
+    if stage >= 3:
+        s.append(f'<rect x="{ox}" y="{oy}" width="{a * cw}" height="{c * rh}" fill="{BLUE_D}"/>')
+        for i in range(1, b if stage == 4 else a + 1):
+            s.append(f'<line x1="{ox + i * cw}" y1="{oy}" x2="{ox + i * cw}" y2="{oy + size}" stroke="#555" stroke-width="0.9"/>')
+        xr = ox + (size if stage == 4 else a * cw)
+        for j in range(1, d):
+            s.append(f'<line x1="{ox}" y1="{oy + j * rh}" x2="{xr}" y2="{oy + j * rh}" stroke="#555" stroke-width="0.9"'
+                     f'{"" if stage == 3 else " stroke-dasharray=\"3,2\""}/>')
+        s.append(svg_frac(13, oy + c * rh / 2 - 5, c, d, size=11))
+    if stage == 4:
+        k = 0
+        for j in range(c):
+            for i in range(a):
+                k += 1
+                s.append(f'<text x="{ox + (i + 0.5) * cw}" y="{oy + (j + 0.5) * rh + 5}" font-size="13" fill="#fff" '
+                         f'font-weight="bold" text-anchor="middle">{k}</text>')
     s.append(f'<rect x="{ox}" y="{oy}" width="{size}" height="{size}" fill="none" stroke="#000" stroke-width="1.6"/>')
-    s.append(svg_frac(ox + a * cw / 2, 13, a, b, size=11))
-    s.append(svg_frac(22, oy + c * rh / 2 - 6, c, d, size=11))
     s.append("</svg>")
     return "".join(s)
 
@@ -278,20 +297,24 @@ ANS.append(("5", ["따라 해 봐요: 11/7 → 44 / 23/9 × 9/5 = 23/5 = 4와 3/
 
 # 6
 L.append(lesson("6", "(분수) × (분수)를 그림으로", "분자는 분자끼리, 분모는 분모끼리", "03, 16", "".join([
-    concept(f"{fr(2, 3)} {X} {fr(3, 4)}는 얼마일까요?",
-            f'<div class="row"><div>{area(2, 3, 3, 4)}</div>'
-            f'<div class="side">① 가로를 3칸으로 똑같이 나누어 2칸을 연하게 칠해요. ({fr(2, 3)})<br>'
-            f'② 세로를 4칸으로 똑같이 나누어 연한 부분의 3칸을 진하게 칠해요. <span class="mx">({fr(2, 3)}의 {fr(3, 4)})</span><br>'
-            f'③ 진한 칸 2 {X} 3 {EQ} 6칸, 전체 3 {X} 4 {EQ} 12칸 → {fr(6, 12)} {EQ} <b>{fr(1, 2)}</b><br>'
-            f'식으로: {fr("2 × 3", "3 × 4")} {EQ} {fr(6, 12)} {EQ} {fr(1, 2)}<br>'
-            f'→ 분자끼리 곱하면 진한 칸 수, 분모끼리 곱하면 전체 칸 수예요.</div></div>'),
+    concept(f"{fr(2, 3)} {X} {fr(3, 4)}는 {fr(2, 3)}의 {fr(3, 4)}이에요",
+            f'<div class="ex" style="margin-top:0">초콜릿 1개의 {fr(2, 3)}을 떼어 내고, 떼어 낸 조각의 {fr(3, 4)}을 먹었어요. 먹은 양은 전체의 얼마일까요?</div>'
+            '<div class="stages">'
+            f'<div>{area(2, 3, 3, 4, 1)}<p>① 초콜릿 1개<br>(전체 {EQ} 1)</p></div>'
+            f'<div>{area(2, 3, 3, 4, 2)}<p>② 가로를 3칸으로 나눠<br>2칸 칠하기 → {fr(2, 3)}</p></div>'
+            f'<div>{area(2, 3, 3, 4, 3)}<p>③ <b>칠한 부분만</b> 세로를<br>4칸으로 나눠 3칸 진하게</p></div>'
+            f'<div>{area(2, 3, 3, 4, 4)}<p>④ 선을 끝까지 그어<br>작은 칸을 세어요</p></div>'
+            '</div>'
+            f'<div class="ex">작은 칸은 모두 3 {X} 4 {EQ} 12칸, 진한 칸(먹은 양)은 2 {X} 3 {EQ} 6칸 → '
+            f'{fr("2 × 3", "3 × 4")} {EQ} {fr(6, 12)} {EQ} <b>{fr(1, 2)}</b><br>'
+            '→ <b>분자끼리</b> 곱하면 진한 칸 수, <b>분모끼리</b> 곱하면 전체 칸 수예요.</div>'),
     rule("분자는 분자끼리, 분모는 분모끼리 곱해요. 곱하기 전에 <b>분자와 분모</b>를 약분하면 더 쉬워요. (분자끼리, 분모끼리는 약분하지 않아요)"),
     follow(f"{fr(4, 9)} {X} {fr(5, 6)} → 4와 6을 {BL}로 약분 → {fr(2, 9)} {X} {fr(5, 3)} {EQ} {bfr()}"),
     drills([f"{fr(1, 2)} {X} {fr(1, 4)} {EQ} {bfr()}", f"{fr(2, 3)} {X} {fr(1, 5)} {EQ} {bfr()}",
             f"{fr(3, 4)} {X} {fr(2, 3)} {EQ} {bfr()}", f"{fr(5, 6)} {X} {fr(3, 10)} {EQ} {bfr()}",
             f"{fr(10, 11)} {X} {fr(2, 5)} {EQ} {bfr()}", f"{fr(4, 15)} {X} {fr(3, 8)} {EQ} {bfr()}"]),
     words([(f"케이크 {fr(4, 9)}kg의 {fr(5, 6)}을 세 사람이 똑같이 나누어 먹었어요. ① 세 사람이 먹은 양은? ② 한 사람이 먹은 양은?", "kg")],
-          start=7, title=None, space=16),
+          start=7, title=None, space=12),
 ])))
 ANS.append(("6", ["따라 해 봐요: 2로 약분 → 10/27", "(1) 1/8", "(2) 2/15", "(3) 1/2", "(4) 1/4", "(5) 4/11",
                   "(6) 1/10", "(7) ① 10/27kg ② 10/27 × 1/3 = 10/81kg"]))
@@ -463,6 +486,9 @@ table.toc td.c { width: 22mm; }
 .steps > div { line-height: 2.1; }
 /* 분수가 연달아 나오는 풀이 줄: 위아래 분수가 붙지 않게 */
 .roomy > div { padding: 0.3em 0; }
+.stages { display: flex; justify-content: space-between; margin: 1mm 0; }
+.stages > div { text-align: center; }
+.stages p { margin: 0; font-size: 9.5pt; line-height: 1.5; }
 .rule { background: #d6ebe0; border: 1px solid #9cc5b0; padding: 2.5mm 4mm; margin-bottom: 3.5mm; line-height: 2; }
 .rt { display: inline-block; background: #1d6b4f; color: #fff; font-size: 9.5pt; font-weight: bold; padding: 0 2mm; margin-right: 3mm; }
 .careful { background: #fff7e0; border: 1px solid #ecd28a; padding: 2mm 4mm; margin-bottom: 3.5mm; line-height: 1.9; }
