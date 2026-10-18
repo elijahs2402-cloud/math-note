@@ -53,7 +53,7 @@ def bar(parts, shade, total=None, shade2=0, cell_labels=None, w=330, h=34, note=
 
 
 def area(a, b, c, d, size=150):
-    """(a/b) × (c/d) 넓이 모델: 세로선으로 b칸 중 a칸(연한 파랑), 그 안에서 가로선으로 d줄 중 c줄(진한 파랑)."""
+    """(a/b) × (c/d) 넓이 모델: 가로를 b칸으로 나눠 a칸(연한 파랑), 세로를 d칸으로 나눠 그 안의 c칸(진한 파랑)."""
     cw, rh = size / b, size / d
     ox, oy = 46, 34
     s = [f'<svg viewBox="0 0 {size + 60} {size + 44}" width="{size + 60}" height="{size + 44}">']
@@ -280,8 +280,8 @@ ANS.append(("5", ["따라 해 봐요: 11/7 → 44 / 23/9 × 9/5 = 23/5 = 4와 3/
 L.append(lesson("6", "(분수) × (분수)를 그림으로", "분자는 분자끼리, 분모는 분모끼리", "03, 16", "".join([
     concept(f"{fr(2, 3)} {X} {fr(3, 4)}는 얼마일까요?",
             f'<div class="row"><div>{area(2, 3, 3, 4)}</div>'
-            f'<div class="side">① 세로선으로 3칸을 만들어 2칸을 연하게 칠해요. ({fr(2, 3)})<br>'
-            f'② 가로선으로 4줄을 만들어 연한 부분의 3줄을 진하게 칠해요. <span class="mx">({fr(2, 3)}의 {fr(3, 4)})</span><br>'
+            f'<div class="side">① 가로를 3칸으로 똑같이 나누어 2칸을 연하게 칠해요. ({fr(2, 3)})<br>'
+            f'② 세로를 4칸으로 똑같이 나누어 연한 부분의 3칸을 진하게 칠해요. <span class="mx">({fr(2, 3)}의 {fr(3, 4)})</span><br>'
             f'③ 진한 칸 2 {X} 3 {EQ} 6칸, 전체 3 {X} 4 {EQ} 12칸 → {fr(6, 12)} {EQ} <b>{fr(1, 2)}</b><br>'
             f'식으로: {fr("2 × 3", "3 × 4")} {EQ} {fr(6, 12)} {EQ} {fr(1, 2)}<br>'
             f'→ 분자끼리 곱하면 진한 칸 수, 분모끼리 곱하면 전체 칸 수예요.</div></div>'),
