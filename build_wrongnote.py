@@ -1,0 +1,193 @@
+"""2026.10.27 시험지 오답노트(A4) HTML 생성기.
+
+사진 8장에서 빨간펜 세모(△) 또는 체크(✓) 표시된 문제만 모았다.
+python3 build_wrongnote.py  ->  wrongnote.html  (Chromium으로 wrongnote.pdf 출력)
+"""
+
+CIRC = "①②③④⑤"
+
+
+def number_line():
+    """16~25 수직선, 19 빈 동그라미 ~ 23 색칠한 동그라미."""
+    W, x0, step, y = 400, 20, 40, 22
+    s = [f'<svg viewBox="0 0 {W} 52" width="{W}" height="52">']
+    s.append(f'<line x1="0" y1="{y}" x2="{W}" y2="{y}" stroke="#000" stroke-width="1.4"/>')
+    for i, v in enumerate(range(16, 26)):
+        x = x0 + i * step
+        s.append(f'<line x1="{x}" y1="{y - 7}" x2="{x}" y2="{y + 7}" stroke="#000" stroke-width="1.4"/>')
+        s.append(f'<text x="{x}" y="{y + 25}" font-size="15" text-anchor="middle">{v}</text>')
+    a, b = x0 + 3 * step, x0 + 7 * step
+    s.append(f'<line x1="{a}" y1="{y}" x2="{b}" y2="{y}" stroke="#000" stroke-width="5"/>')
+    s.append(f'<circle cx="{a}" cy="{y}" r="5.5" fill="#fff" stroke="#000" stroke-width="1.8"/>')
+    s.append(f'<circle cx="{b}" cy="{y}" r="5.5" fill="#000"/>')
+    s.append("</svg>")
+    return "".join(s)
+
+
+def choices(items, cols=3):
+    cells = "".join(f"<span>{CIRC[i]} {t}</span>" for i, t in enumerate(items))
+    return f'<div class="choices" style="grid-template-columns: repeat({cols}, auto)">{cells}</div>'
+
+
+def choices_list(items):
+    return '<div class="clist">' + "".join(f"<div>{CIRC[i]} {t}</div>" for i, t in enumerate(items)) + "</div>"
+
+
+# (원래 번호, 표시, 문제, 덧붙임, 답 칸 종류)
+MATH = [
+    (2, "체크",
+     "정아네 학교 5학년 학생들이 소풍을 가려면 정원이 40명인 버스가 최소 7대 필요합니다. "
+     "정아네 학교 5학년 학생 수의 범위를 이상과 이하를 이용하여 나타내 보시오.",
+     "", '<div class="blank">(<span class="u"></span>명 이상 <span class="u"></span>명 이하)</div>'),
+    (8, "체크", "수직선에 나타낸 수의 범위에 속하는 수를 모두 고르시오.",
+     f'<div class="fig">{number_line()}</div>' + choices(["17.1", "19", "23", "22.5", "25"]),
+     '<div class="paren">(&emsp;&emsp;&emsp;&emsp;&emsp;)</div>'),
+    (9, "체크",
+     "현우네 학교 4학년 학생들이 체험 학습을 가려면 정원이 40명인 버스가 5대 필요하다고 합니다. "
+     "현우네 학교 4학년 학생은 몇 명 초과 몇 명 이하인지 구하시오.",
+     "", '<div class="blank">(<span class="u"></span>명 초과 <span class="u"></span>명 이하)</div>'),
+    (13, "체크", "올림하여 천의 자리까지 나타내면 3000이 되는 수를 모두 고르시오.",
+     choices(["1980", "2763", "3005", "2002", "3482"]),
+     '<div class="paren">(&emsp;&emsp;&emsp;&emsp;&emsp;)</div>'),
+]
+
+SOCIAL = [
+    (1, "세모", "통일 신라 말의 상황으로 알맞은 것을 <u>두 가지</u> 고르시오.",
+     choices_list(["지방에서 호족이 성장했다.", "왕권이 강해 나라가 안정됐다.",
+                   "모든 사람들이 어려움 없이 잘 살았다.", "지배층의 권력 다툼으로 나라가 혼란했다.",
+                   "신분 차별이 없어져 모든 사람이 평등했다."]),
+     '<div class="paren">(&emsp;&emsp;,&emsp;&emsp;)</div>'),
+    (5, "체크", "왕건의 뒤를 이은 왕들이 새롭게 펼친 정책이 <u>아닌</u> 것은 어느 것입니까?",
+     choices_list(["과거제를 실시했다.", "주요 지방에 관청을 두었다.", "주요 지방에 관리를 보냈다.",
+                   "억울하게 노비가 된 백성을 풀어 주었다.", "신분에 따라 오를 수 있는 관직을 정해 두었다."]),
+     '<div class="paren">(&emsp;&emsp;&emsp;)</div>'),
+    (9, "체크", "고려 전기에 고려가 거란을 적대시한 까닭을 쓰시오.", "", '<div class="lines"><i></i><i></i></div>'),
+    (11, "체크", "고려는 거란의 3차 침입에 누가 중심이 되어, 어떻게 대응했는지 쓰시오.", "",
+     '<div class="lines"><i></i><i></i></div>'),
+    (19, "체크", "『직지』에 대한 설명으로 알맞은 것은 어느 것입니까?",
+     choices_list(["현재 우리나라에 있다.", "오늘날 남아 있지 않다는 한계가 있다.",
+                   "세계 최초로 만들어진 목판 인쇄본이다.", "세계 최초로 만들어진 금속 활자 인쇄본이다.",
+                   "오늘날 남아 있는 세계에서 가장 오래된 금속 활자 인쇄본이다."]),
+     '<div class="paren">(&emsp;&emsp;&emsp;)</div>'),
+]
+
+# (과목, 원래 번호, 정답, 풀이)
+ANSWERS = [
+    ("수학", 2, "241명 이상 280명 이하",
+     "버스 6대로는 모자라므로 학생은 40 × 6 = 240명보다 많습니다. 7대면 모두 탈 수 있으므로 "
+     "40 × 7 = 280명까지입니다. 240명 초과는 241명 이상과 같습니다."),
+    ("수학", 8, "③, ④ (23, 22.5)",
+     "19는 빈 동그라미라서 포함되지 않고(19 초과), 23은 색칠한 동그라미라서 포함됩니다(23 이하). "
+     "19 초과 23 이하인 수는 23과 22.5입니다."),
+    ("수학", 9, "160명 초과 200명 이하",
+     "버스 4대(40 × 4 = 160명)로는 모자라므로 160명 초과, 5대(40 × 5 = 200명)면 모두 탈 수 있으므로 200명 이하입니다."),
+    ("수학", 13, "②, ④ (2763, 2002)",
+     "올림하여 3000이 되는 수는 2001부터 3000까지입니다. 1980은 2000, 3005와 3482는 4000이 됩니다."),
+    ("사회", 1, "①, ④",
+     "통일 신라 말에는 귀족들의 왕위 다툼으로 나라가 혼란했고, 지방에서는 호족이 힘을 키웠습니다."),
+    ("사회", 5, "⑤",
+     "신분에 따라 오를 수 있는 관직을 정한 것은 신라의 골품제입니다. 고려의 왕들은 과거제를 실시하고, "
+     "지방에 관청과 관리를 두고, 억울하게 노비가 된 사람을 풀어 주었습니다."),
+    ("사회", 9, "거란이 고구려를 이은 발해를 멸망시켰기 때문입니다.",
+     "고려는 고구려를 계승했다고 여겨, 같은 고구려를 이은 발해를 무너뜨린 거란을 적으로 보았습니다."),
+    ("사회", 11, "강감찬이 중심이 되어 귀주에서 거란군을 크게 물리쳤습니다(귀주 대첩).",
+     "답에 '누가(강감찬)', '어디서(귀주)', '어떻게(크게 물리침)'가 모두 들어가야 합니다."),
+    ("사회", 19, "⑤",
+     "『직지』는 지금 프랑스 국립 도서관에 있고, 오늘날 남아 있는 금속 활자 인쇄본 중 세계에서 가장 오래되었습니다. "
+     "가장 먼저 만든 금속 활자 인쇄본은 『상정고금예문』이지만 남아 있지 않습니다."),
+]
+
+
+def item(subject, n, mark, q, extra, ans):
+    sym = "△" if mark == "세모" else "✓"
+    return (
+        f'<div class="item"><div class="qh"><span class="num">{n}</span>'
+        f'<span class="mark">{sym} {mark}</span></div>'
+        f'<div class="q">{q}</div>{extra}{ans}'
+        '<div class="work"><span>다시 풀기</span></div>'
+        '<div class="why">틀린 까닭 <i></i></div></div>'
+    )
+
+
+CSS = """
+@page { size: A4; margin: 0; }
+* { box-sizing: border-box; }
+body { margin: 0; font-family: 'Noto Sans CJK KR', 'Noto Sans KR', 'Malgun Gothic', 'Apple SD Gothic Neo', sans-serif; color: #000; }
+.page { width: 210mm; height: 297mm; padding: 13mm 15mm 10mm; display: flex; flex-direction: column; page-break-after: always; overflow: hidden; }
+.page:last-child { page-break-after: auto; }
+header { border-bottom: 2.5px solid #1d6b4f; padding-bottom: 3mm; margin-bottom: 4mm; display: flex; justify-content: space-between; align-items: flex-end; }
+header .t1 { font-size: 11pt; color: #1d6b4f; font-weight: bold; }
+header .t2 { font-size: 18pt; font-weight: bold; margin-top: 1mm; }
+header .info { font-size: 11pt; white-space: nowrap; }
+header .info span { display: inline-block; border-bottom: 1px solid #000; width: 26mm; margin-left: 2mm; }
+.small-head { font-size: 10pt; color: #1d6b4f; font-weight: bold; border-bottom: 1.5px solid #1d6b4f; padding-bottom: 2mm; margin-bottom: 4mm; }
+.grid { flex: 1; display: grid; gap: 4mm; }
+.item { border: 1px solid #999; padding: 3mm 4mm; display: flex; flex-direction: column; min-height: 0; }
+.qh { display: flex; align-items: center; gap: 3mm; margin-bottom: 1mm; }
+.num { font-size: 15pt; font-weight: bold; color: #1d6b4f; line-height: 1; }
+.mark { font-size: 9pt; color: #c0392b; border: 1px solid #c0392b; padding: 0 1.5mm; }
+.q { font-size: 11.5pt; line-height: 1.8; word-break: keep-all; }
+.choices { display: grid; column-gap: 12mm; row-gap: 1mm; margin: 1.5mm 0 0 2mm; font-size: 12pt; justify-content: start; }
+.clist { margin: 1mm 0 0 2mm; font-size: 11pt; line-height: 1.75; }
+.fig { margin: 2mm 0 1mm 4mm; }
+.fig svg text { font-family: 'Noto Sans CJK KR', 'Noto Sans KR', sans-serif; }
+.paren, .blank { text-align: right; font-size: 12pt; margin-top: 1mm; }
+.u { display: inline-block; width: 18mm; border-bottom: 1px solid #000; margin: 0 1mm; }
+.lines i { display: block; border-bottom: 1px solid #000; height: 9mm; }
+.work { flex: 1; min-height: 14mm; margin-top: 2mm; border-top: 1px dashed #aaa; }
+.work span, .why { font-size: 9pt; color: #777; }
+.why { display: flex; gap: 2mm; align-items: flex-end; margin-top: 1mm; }
+.why i { flex: 1; border-bottom: 1px solid #bbb; height: 6mm; }
+.ans-list { display: flex; flex-direction: column; gap: 3.2mm; }
+.sub { font-size: 12pt; font-weight: bold; color: #1d6b4f; margin: 2mm 0 0; }
+.a { display: grid; grid-template-columns: 11mm 1fr; column-gap: 2mm; font-size: 11pt; line-height: 1.7; word-break: keep-all; }
+.a .n { font-weight: bold; color: #1d6b4f; font-size: 13pt; }
+.a .r { font-weight: bold; }
+.a .e { grid-column: 2; color: #333; font-size: 10.5pt; }
+footer { text-align: center; font-size: 9pt; color: #777; margin-top: 2mm; }
+"""
+
+
+def build():
+    # (과목, 문제들, 행 높이 비율)
+    pages_spec = [
+        ("수학", MATH[:2], "1fr 1.2fr"),
+        ("수학", MATH[2:], "1fr 1fr"),
+        ("사회", SOCIAL[:2], "1fr 1fr"),
+        ("사회", SOCIAL[2:], "0.9fr 0.9fr 1.3fr"),
+    ]
+    total = len(pages_spec) + 1
+    pages = []
+    for i, (subj, items, rows) in enumerate(pages_spec):
+        if i == 0:
+            head = (
+                '<header><div><div class="t1">2026년 10월 27일 시험 · 수학, 사회</div>'
+                '<div class="t2">오답노트</div></div>'
+                '<div class="info">이름<span></span>&ensp;다시 푼 날<span></span></div></header>'
+            )
+        else:
+            title = "수학 (수의 범위와 어림하기)" if subj == "수학" else "사회 (고려의 성립과 발전)"
+            head = f'<div class="small-head">오답노트 · {title}</div>'
+        body = "".join(item(subj, *it) for it in items)
+        pages.append(f'<section class="page">{head}<div class="grid" style="grid-template-rows: {rows}">{body}</div>'
+                     f'<footer>{i + 1} / {total}</footer></section>')
+
+    rows, last = [], None
+    for subj, n, r, e in ANSWERS:
+        if subj != last:
+            rows.append(f'<div class="sub">{subj}</div>')
+            last = subj
+        rows.append(f'<div class="a"><span class="n">{n}</span><span class="r">{r}</span><span class="e">{e}</span></div>')
+    pages.append(f'<section class="page"><div class="small-head">오답노트 · 정답과 풀이</div>'
+                 f'<div class="ans-list">{"".join(rows)}</div><footer>{total} / {total}</footer></section>')
+
+    html = (
+        '<!doctype html><html lang="ko"><head><meta charset="utf-8">'
+        f'<title>오답노트 2026.10.27</title><style>{CSS}</style></head><body>{"".join(pages)}</body></html>'
+    )
+    with open("wrongnote.html", "w", encoding="utf-8") as f:
+        f.write(html)
+
+
+if __name__ == "__main__":
+    build()
