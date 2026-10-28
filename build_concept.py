@@ -83,8 +83,106 @@ def stage(svg, caption):
     return f'<div class="stage">{svg}<div class="cap">{caption}</div></div>'
 
 
+# ---------- 낱말 풀이 (사회 한자어) ----------
+# (낱말, 한자, 음과 뜻, 쉬운 풀이). 본문에서 처음 나오는 곳에 점선 밑줄을 긋고 차시 끝에 모아 보여 준다.
+GLOSS = {
+    5: [
+        ("통일", "統一", "거느릴 통·한 일", "여럿을 하나로 합침"),
+        ("진골", "眞骨", "참 진·뼈 골", "신라에서 왕족 핏줄의 높은 신분"),
+        ("귀족", "貴族", "귀할 귀·겨레 족", "신분이 높고 힘 있는 집안 사람"),
+        ("세금", "稅金", "세금 세·쇠 금", "나라 살림을 위해 백성이 내는 돈이나 곡식"),
+        ("혼란", "混亂", "섞을 혼·어지러울 란", "뒤죽박죽 어지러움"),
+        ("군사", "軍士", "군사 군·선비 사", "싸움을 하는 사람, 병사"),
+        ("세력", "勢力", "형세 세·힘 력", "힘을 가진 무리"),
+        ("성주", "城主", "성 성·주인 주", "성의 주인"),
+        ("장군", "將軍", "장수 장·군사 군", "군대를 이끄는 우두머리"),
+        ("호족", "豪族", "호걸 호·겨레 족", "지방에서 힘이 센 집안"),
+        ("후삼국", "後三國", "뒤 후·석 삼·나라 국", "신라 말에 다시 생긴 세 나라"),
+        ("신하", "臣下", "신하 신·아래 하", "왕을 섬기며 나라 일을 하는 사람"),
+        ("건국", "建國", "세울 건·나라 국", "나라를 세움"),
+        ("지배층", "支配層", "지탱할 지·나눌 배·층 층", "나라를 다스리는 사람들"),
+        ("권력", "權力", "권세 권·힘 력", "남을 따르게 하는 힘"),
+        ("왕권", "王權", "임금 왕·권세 권", "왕이 가진 힘"),
+        ("평등", "平等", "평평할 평·무리 등", "차별 없이 모두 같음"),
+        ("안정", "安定", "편안 안·정할 정", "흔들림 없이 편안함"),
+    ],
+    6: [
+        ("노비", "奴婢", "종 노·계집종 비", "남의 집에 매여 일하던 사람"),
+        ("전쟁", "戰爭", "싸움 전·다툴 쟁", "나라와 나라가 군대로 싸움"),
+        ("포로", "捕虜", "잡을 포·사로잡을 로", "전쟁에서 사로잡힌 사람"),
+        ("백성", "百姓", "일백 백·성씨 성", "나라의 보통 사람들"),
+        ("노비안검법", "奴婢按檢法", "살필 안·검사할 검·법 법", "억울한 노비를 가려 풀어 준 법"),
+        ("실력", "實力", "열매 실·힘 력", "실제로 가진 능력"),
+        ("관리", "官吏", "벼슬 관·벼슬아치 리", "나라 일을 맡아 하는 사람"),
+        ("과거제", "科擧制", "과목 과·들 거·절제할 제", "시험으로 관리를 뽑는 제도"),
+        ("충성", "忠誠", "충성 충·정성 성", "진심을 다해 섬김"),
+        ("관청", "官廳", "벼슬 관·관청 청", "나라 일을 보는 곳"),
+        ("왕권", "王權", "임금 왕·권세 권", "왕이 가진 힘"),
+        ("실시", "實施", "열매 실·베풀 시", "실제로 해 나감"),
+        ("신분", "身分", "몸 신·나눌 분", "태어나면서 정해진 사회 속 자리"),
+        ("관직", "官職", "벼슬 관·직분 직", "나라에서 맡는 벼슬 자리"),
+        ("골품제", "骨品制", "뼈 골·물건 품·절제할 제", "핏줄로 신분을 나눈 신라 제도"),
+        ("정책", "政策", "정사 정·꾀 책", "나라를 다스리는 방법"),
+        ("제도", "制度", "절제할 제·법도 도", "정해 놓은 규칙이나 방법"),
+    ],
+    7: [
+        ("멸망", "滅亡", "멸할 멸·망할 망", "나라가 망해 없어짐"),
+        ("침입", "侵入", "침노할 침·들 입", "남의 땅에 쳐들어옴"),
+        ("장수", "將帥", "장수 장·장수 수", "군사를 이끄는 우두머리"),
+        ("대군", "大軍", "큰 대·군사 군", "수가 아주 많은 군대"),
+        ("적진", "敵陣", "대적할 적·진칠 진", "적군이 모여 있는 곳"),
+        ("강동 6주", "江東六州", "강 강·동녘 동·고을 주", "압록강 동쪽 여섯 고을"),
+        ("외교", "外交", "바깥 외·사귈 교", "다른 나라와 사귀고 의논하는 일"),
+        ("담판", "談判", "말씀 담·판단할 판", "만나서 말로 따져 결정함"),
+        ("수도", "首都", "머리 수·도읍 도", "나라의 중심 도시"),
+        ("공격", "攻擊", "칠 공·칠 격", "적을 쳐들어가 싸움"),
+        ("대첩", "大捷", "큰 대·이길 첩", "싸움에서 크게 이김"),
+        ("대응", "對應", "대할 대·응할 응", "어떤 일에 맞추어 행동함"),
+    ],
+    8: [
+        ("목판", "木板", "나무 목·널빤지 판", "글자나 그림을 새긴 나무판"),
+        ("인쇄", "印刷", "도장 인·인쇄할 쇄", "글이나 그림을 종이에 찍어 냄"),
+        ("팔만대장경", "八萬大藏經", "여덟 팔·일만 만·감출 장·글 경", "불경을 새긴 목판 8만여 장"),
+        ("금속", "金屬", "쇠 금·무리 속", "쇠붙이"),
+        ("활자", "活字", "살 활·글자 자", "하나씩 바꿔 끼울 수 있는 글자 도장"),
+        ("기록", "記錄", "기록할 기·기록할 록", "뒤에 남기려고 적어 둔 것"),
+        ("흥덕사", "興德寺", "일 흥·큰 덕·절 사", "청주에 있던 절"),
+        ("인쇄본", "印刷本", "도장 인·인쇄할 쇄·근본 본", "찍어서 만든 책"),
+        ("국립", "國立", "나라 국·설 립", "나라에서 세움"),
+        ("세계 기록 유산", "世界記錄遺産", "남길 유·낳을 산", "세계가 함께 지킬 귀한 기록"),
+        ("최초", "最初", "가장 최·처음 초", "맨 처음"),
+    ],
+}
+
+
+def annotate(no, body):
+    """GLOSS 낱말이 본문(그림 설명 뒤)에 처음 나오는 곳에 밑줄을 긋고, 나온 순서대로 풀이 상자를 붙인다."""
+    start = body.find("</figure>") + 1 if "</figure>" in body else 0
+    found = []
+    for word, hz, hun, mean in sorted(GLOSS[no], key=lambda g: -len(g[0])):
+        p = start
+        while True:
+            p = body.find(word, p)
+            if p < 0:
+                raise ValueError(f"{no}차시 본문에 '{word}'가 없어요")
+            in_tag = body.rfind("<", 0, p) > body.rfind(">", 0, p)
+            h = body.rfind('<span class="hj">', 0, p)
+            in_hj = h >= 0 and body.find("</span>", h) > p
+            if not in_tag and not in_hj:
+                break
+            p += 1
+        body = body[:p] + f'<span class="hj">{word}</span>' + body[p + len(word):]
+        found.append((word, hz, hun, mean))
+    found.sort(key=lambda g: body.find(f'<span class="hj">{g[0]}</span>'))
+    items = "".join(f'<div{" class=wide" if len(w + hz + hun + m) > 34 else ""}><b>{w}</b> <span class="hz">{hz}</span> <span class="hn">{hun}</span> {m}</div>'
+                    for w, hz, hun, m in found)
+    return body + f'<div class="gloss blk"><div class="gt">낱말 풀이 <span>밑줄 친 낱말의 한자와 뜻</span></div><div class="gl">{items}</div></div>'
+
+
 # ---------- 블록 ----------
 def lesson(no, subj, title, sub, linked, body):
+    if no in GLOSS:
+        body = annotate(no, body)
     return (
         f'<section class="lesson"><div class="lh"><span class="ln">{no}차시</span>'
         f'<div><div class="lt">{title}</div><div class="ls">{subj} · {sub}</div></div>'
@@ -394,14 +492,22 @@ table.toc td.l { width: 34mm; color: #777; font-size: 9.5pt; text-align: right; 
 .arr { color: #1d6b4f; font-size: 14pt; }
 .rule { background: #d6ebe0; padding: 2.5mm 4mm; margin-bottom: 3mm; line-height: 1.9; }
 .rt { display: inline-block; background: #1d6b4f; color: #fff; font-size: 9.5pt; font-weight: bold; padding: 0 2mm; margin-right: 3mm; }
-.careful { background: #fff7e0; padding: 2mm 4mm; margin-bottom: 3mm; line-height: 1.85; }
+.careful { background: #fff7e0; padding: 1.6mm 4mm; margin-bottom: 2.5mm; line-height: 1.6; }
 .careful b:first-child { color: #9a6b00; }
-.pic { float: right; width: 62mm; margin: 0.5mm 0 1.5mm 4mm; }
+.pic { float: right; width: 60mm; margin: 0.5mm 0 1.5mm 4mm; }
 .pic img { width: 100%; display: block; border: 1px solid #ccc; border-radius: 1.5mm; }
 .pic figcaption { font-size: 8.5pt; line-height: 1.4; color: #555; margin-top: 0.8mm; }
-.story { border: 1.5px solid #8a5a2b; padding: 3mm 4mm; margin-bottom: 3mm; }
+.hj { border-bottom: 1px dotted #8a5a2b; }
+.gloss { border-top: 1px dashed #8a5a2b; margin-top: 2mm; padding-top: 1.5mm; font-size: 8.3pt; line-height: 1.38; }
+.gt { font-weight: bold; color: #8a5a2b; font-size: 9.5pt; margin-bottom: 0.8mm; }
+.gt span { font-weight: normal; color: #777; font-size: 8pt; margin-left: 2mm; }
+.gl { display: grid; grid-template-columns: 1fr 1fr; grid-auto-flow: dense; column-gap: 5mm; row-gap: 0.3mm; }
+.gl .wide { grid-column: 1 / -1; }
+.hz { color: #8a5a2b; }
+.hn { color: #777; }
+.story { border: 1.5px solid #8a5a2b; padding: 2.5mm 4mm 2mm; margin-bottom: 2.5mm; }
 .st { font-weight: bold; color: #8a5a2b; font-size: 12pt; margin-bottom: 1.5mm; }
-.scene { display: grid; grid-template-columns: 15mm 1fr; gap: 2mm; line-height: 1.8; margin-bottom: 1.2mm; font-size: 10.8pt; }
+.scene { display: grid; grid-template-columns: 15mm 1fr; gap: 2mm; line-height: 1.55; margin-bottom: 0.8mm; font-size: 10.4pt; }
 .sn { color: #8a5a2b; font-weight: bold; font-size: 9.5pt; padding-top: 0.6mm; }
 .tl { display: flex; border-top: 2px solid #8a5a2b; margin: 1mm 0 3.5mm; }
 .tp { flex: 1; padding: 1.5mm 1mm 0; text-align: center; position: relative; }
@@ -409,21 +515,21 @@ table.toc td.l { width: 34mm; color: #777; font-size: 9.5pt; text-align: right; 
 .ty { font-weight: bold; font-size: 10pt; }
 .te { font-size: 9.5pt; color: #333; }
 .tbl { width: 100%; border-collapse: collapse; margin: 1.5mm 0 3mm; font-size: 10.5pt; }
-.tbl th, .tbl td { border: 1px solid #999; padding: 1.2mm 2.5mm; text-align: center; }
+.tbl th, .tbl td { border: 1px solid #999; padding: 0.7mm 2.5mm; text-align: center; }
 .tbl th { background: #eef3f0; }
 .pt { font-weight: bold; color: #1d6b4f; font-size: 12pt; margin: 2.5mm 0 1.5mm; border-top: 1px solid #1d6b4f; padding-top: 2mm; }
 .grid2 { display: grid; grid-template-columns: 1fr 1fr; column-gap: 6mm; }
 .grid2 > .dr { line-height: 2.1; margin-bottom: 1.5mm; break-inside: avoid; }
 .grid2 .picks { gap: 6mm; margin-left: 4mm; }
 .grid2 .fig { margin-left: 0; }
-.grid1 > .dr { line-height: 2.1; margin-bottom: 1.5mm; break-inside: avoid; }
+.grid1 > .dr { line-height: 1.95; margin-bottom: 1.2mm; break-inside: avoid; }
 .qn { color: #1d6b4f; font-weight: bold; margin-right: 2mm; }
 .picks { display: flex; gap: 10mm; margin: 0.5mm 0 0 7mm; font-size: 12pt; }
 .fig { margin: 1mm 0 0 7mm; }
 .wans { text-align: right; }
 .u { display: inline-block; border-bottom: 1px solid #000; height: 1.3em; vertical-align: bottom; }
 .paren { float: right; }
-.wline { border-bottom: 1px solid #000; height: 9mm; margin-left: 7mm; }
+.wline { border-bottom: 1px solid #000; height: 8mm; margin-left: 7mm; }
 .row4 { display: flex; justify-content: space-between; margin-left: 7mm; }
 .ox2 { margin-left: 7mm; line-height: 2.1; }
 .answers { break-before: page; }
