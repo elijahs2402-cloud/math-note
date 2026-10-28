@@ -113,10 +113,10 @@ def picture(no, caption):
     return f'<figure class="pic blk"><img src="{path}"><figcaption>{caption}</figcaption></figure>'
 
 
-def story(title, scenes):
+def story(title, scenes, pic=""):
     rows = "".join(f'<div class="scene"><span class="sn">장면 {i + 1}</span><div>{t}</div></div>'
                    for i, t in enumerate(scenes))
-    return f'<div class="story blk"><div class="st">이야기로 풀어 보기 · {title}</div>{rows}</div>'
+    return f'<div class="story blk"><div class="st">이야기로 풀어 보기 · {title}</div>{pic}{rows}</div>'
 
 
 def timeline(points):
@@ -247,8 +247,7 @@ L4 = lesson(4, "수학", "올림", "모자라면 하나 더", "수학 13번", ""
 
 # ---------- 사회 ----------
 L5 = lesson(5, "사회", "통일 신라 말의 혼란과 고려의 건국", "왜 새 나라가 생겼을까요", "사회 1번", "".join([
-    picture(5, "진골 귀족들이 왕 자리를 두고 다투는 사이, 지방에서는 호족이 힘을 키웠어요."),
-    story("왕 자리를 둘러싼 싸움", [
+    story("왕 자리를 둘러싼 싸움", pic=picture(5, "진골 귀족들이 왕 자리를 두고 다투는 사이, 지방에서는 호족이 힘을 키웠어요."), scenes=[
         "삼국을 통일한 신라는 처음에는 평화로웠어요. 그런데 시간이 지나자 서울(경주)의 진골 귀족들이 "
         "<b>서로 왕이 되겠다고 싸우기</b> 시작했어요. 왕이 바뀌고 또 바뀌어서, 약 150년 동안 왕이 20명이나 바뀌었어요.",
         "귀족들이 싸움에 정신이 팔린 사이 나라 살림은 엉망이 되었어요. 세금을 더 걷으려 하자 "
@@ -271,8 +270,7 @@ L5 = lesson(5, "사회", "통일 신라 말의 혼란과 고려의 건국", "왜
 ]))
 
 L6 = lesson(6, "사회", "왕건의 뒤를 이은 왕들", "왕의 힘을 키워요", "사회 5번", "".join([
-    picture(6, "광종은 시험(과거제)으로 관리를 뽑고, 억울한 노비를 풀어 주었어요."),
-    story("힘센 호족을 어떻게 할까?", [
+    story("힘센 호족을 어떻게 할까?", pic=picture(6, "광종은 시험(과거제)으로 관리를 뽑고, 억울한 노비를 풀어 주었어요."), scenes=[
         "왕건은 나라를 세울 때 호족들의 도움을 많이 받았어요. 그래서 호족의 딸들과 결혼하고 벼슬도 주었어요. "
         "그런데 왕건이 죽고 나니 <b>호족의 힘이 너무 세서</b> 왕이 마음대로 나라를 다스리기 어려웠어요.",
         "넷째 왕 <b>광종</b>은 생각했어요. \"억울하게 노비가 된 사람을 풀어 주자!\" 호족들은 전쟁 포로나 빚진 사람을 "
@@ -296,8 +294,7 @@ L6 = lesson(6, "사회", "왕건의 뒤를 이은 왕들", "왕의 힘을 키워
 ]))
 
 L7 = lesson(7, "사회", "거란의 침입을 물리친 고려", "말로 막고, 싸워서 이기다", "사회 9번, 11번", "".join([
-    picture(7, "강감찬이 귀주에서 거란군을 크게 물리쳤어요(귀주 대첩)."),
-    story("북쪽에서 온 거란", [
+    story("북쪽에서 온 거란", pic=picture(7, "강감찬이 귀주에서 거란군을 크게 물리쳤어요(귀주 대첩)."), scenes=[
         "고려 북쪽에는 <b>거란</b>이라는 나라가 있었어요. 거란은 926년에 <b>발해를 멸망시켰어요</b>. "
         "발해는 고구려를 이은 나라였고, 고려도 고구려를 이었다고 생각했어요. 그래서 고려는 형제 같은 나라를 무너뜨린 "
         "<b>거란을 적으로 여겼어요</b>. 왕건은 거란이 보낸 낙타를 다리 밑에 매어 굶겨 버리기도 했대요.",
@@ -321,8 +318,7 @@ L7 = lesson(7, "사회", "거란의 침입을 물리친 고려", "말로 막고,
 ]))
 
 L8 = lesson(8, "사회", "금속 활자와 『직지』", "남아 있는 가장 오래된 책", "사회 19번", "".join([
-    picture(8, "글자를 하나씩 금속으로 만들어 모아 찍는 금속 활자 인쇄"),
-    story("글자를 하나하나 만들다", [
+    story("글자를 하나하나 만들다", pic=picture(8, "글자를 하나씩 금속으로 만들어 모아 찍는 금속 활자 인쇄"), scenes=[
         "옛날에는 책을 찍으려면 나무판에 한 쪽을 통째로 새겼어요(<b>목판 인쇄</b>). 『팔만대장경』이 바로 목판이에요. "
         "그런데 다른 책을 찍으려면 판을 처음부터 다시 새겨야 했어요.",
         "고려 사람들은 꾀를 냈어요. \"글자를 <b>하나씩 따로</b> 만들어 두고 필요할 때 모아 찍자!\" "
@@ -400,9 +396,9 @@ table.toc td.l { width: 34mm; color: #777; font-size: 9.5pt; text-align: right; 
 .rt { display: inline-block; background: #1d6b4f; color: #fff; font-size: 9.5pt; font-weight: bold; padding: 0 2mm; margin-right: 3mm; }
 .careful { background: #fff7e0; padding: 2mm 4mm; margin-bottom: 3mm; line-height: 1.85; }
 .careful b:first-child { color: #9a6b00; }
-.pic { margin: 0 0 3mm; text-align: center; }
-.pic img { width: 110mm; display: block; margin: 0 auto; border: 1px solid #ccc; }
-.pic figcaption { font-size: 9.5pt; color: #555; margin-top: 1mm; }
+.pic { float: right; width: 62mm; margin: 0.5mm 0 1.5mm 4mm; }
+.pic img { width: 100%; display: block; border: 1px solid #ccc; border-radius: 1.5mm; }
+.pic figcaption { font-size: 8.5pt; line-height: 1.4; color: #555; margin-top: 0.8mm; }
 .story { border: 1.5px solid #8a5a2b; padding: 3mm 4mm; margin-bottom: 3mm; }
 .st { font-weight: bold; color: #8a5a2b; font-size: 12pt; margin-bottom: 1.5mm; }
 .scene { display: grid; grid-template-columns: 15mm 1fr; gap: 2mm; line-height: 1.8; margin-bottom: 1.2mm; font-size: 10.8pt; }
